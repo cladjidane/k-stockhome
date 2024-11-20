@@ -1,7 +1,9 @@
+import { Camera, Minus, Plus, X } from 'lucide-react';
 import React, { useState } from 'react';
-import { useZxing } from 'react-zxing';
-import { Camera, X, Plus, Minus } from 'lucide-react';
+
 import { Product } from '../types';
+import { getProductInfo } from '../utils/productUtils';
+import { useZxing } from 'react-zxing';
 
 interface BarcodeScannerProps {
   onProductFound: (product: Omit<Product, 'id'>) => void;
@@ -10,13 +12,16 @@ interface BarcodeScannerProps {
   onUpdateQuantity?: (id: string, quantity: number) => void;
 }
 
+interface ScannedProduct {
+  name: string;
+  existingProduct?: Product;
+  categories?: string;
+}
+
 export default function BarcodeScanner({ onProductFound, onClose, products, onUpdateQuantity }: BarcodeScannerProps) {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [scannedProduct, setScannedProduct] = useState<{
-    name: string;
-    existingProduct?: Product;
-  } | null>(null);
+  const [scannedProduct, setScannedProduct] = useState<ScannedProduct | null>(null);
 
   const { ref } = useZxing({
     onDecodeResult: async (result) => {
@@ -31,13 +36,15 @@ export default function BarcodeScanner({ onProductFound, onClose, products, onUp
         if (data.status === 1) {
           const product = data.product;
           const productName = product.product_name_fr || product.product_name || 'Produit inconnu';
+          const categories = product.categories || '';
           
           // Recherche si le produit existe déjà
           const existingProduct = products.find(p => p.name.toLowerCase() === productName.toLowerCase());
           
           setScannedProduct({
             name: productName,
-            existingProduct
+            existingProduct,
+            categories
           });
         } else {
           setError('Produit non trouvé dans la base de données');
@@ -56,12 +63,23 @@ export default function BarcodeScanner({ onProductFound, onClose, products, onUp
 
   const handleAddProduct = () => {
     if (scannedProduct) {
+      const productInfo = getProductInfo(scannedProduct.categories, scannedProduct.labels);
+
       onProductFound({
         name: scannedProduct.name,
         quantity: 1,
         unit: 'unité',
         category: 'product',
-        location: 'Placard cuisine'
+        location: productInfo.location,
+        categories: scannedProduct.categories,
+        labels: scannedProduct.labels,
+        nutriscore: scannedProduct.nutriscore_grade,
+        nutriments: {
+          energy_100g: scannedProduct.nutriments?.energy_100g || 0,
+          proteins_100g: scannedProduct.nutriments?.proteins_100g || 0,
+          carbohydrates_100g: scannedProduct.nutriments?.carbohydrates_100g || 0,
+          fat_100g: scannedProduct.nutriments?.fat_100g || 0,
+        }
       });
       onClose();
     }

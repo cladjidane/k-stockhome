@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
 import { Package } from 'lucide-react';
+import { Product } from './types';
 import ProductForm from './components/ProductForm';
 import ProductList from './components/ProductList';
-import { Product } from './types';
 
 function App() {
   const [products, setProducts] = useState<Product[]>(() => {
@@ -31,13 +32,21 @@ function App() {
     ));
   };
 
+  const handleUpdateLocation = (id: string, location: string) => {
+    setProducts(products.map(product => 
+      product.id === id 
+        ? { ...product, location } 
+        : product
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <Package className="w-8 h-8 text-blue-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Mon Placard</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Le Placard à Ju</h1>
           </div>
           <div className="text-sm text-gray-500">
             {products.length} article{products.length !== 1 ? 's' : ''}
@@ -60,6 +69,7 @@ function App() {
               products={products}
               onDelete={handleDeleteProduct}
               onUpdateQuantity={handleUpdateQuantity}
+              onUpdateLocation={handleUpdateLocation}
             />
           </div>
         </div>

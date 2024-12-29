@@ -3,6 +3,7 @@ import { ShoppingCart, Check, X, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingListItem, Product } from '../types';
 import PurchaseValidation from './PurchaseValidation';
+import ShareButton from './ShareButton';
 
 interface ShoppingListProps {
   items: ShoppingListItem[];
@@ -56,6 +57,12 @@ export default function ShoppingList({
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          Liste de courses ({items.length})
+        </h2>
+        <ShareButton products={products} />
+      </div>
       <AnimatePresence>
         {items.map((item) => {
           const product = products.find(p => p.id === item.productId);

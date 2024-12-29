@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface TooltipProps {
   children: React.ReactNode;
@@ -55,6 +56,7 @@ export default function Tooltip({ children, content, position = 'top', delay = 2
   const tooltipRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ top: 0, left: 0 });
+  const { isDarkMode } = useTheme();
 
   const updatePosition = () => {
     if (triggerRef.current && tooltipRef.current && isVisible) {
@@ -116,7 +118,7 @@ export default function Tooltip({ children, content, position = 'top', delay = 2
                 left: tooltipPosition.left
               }}
             >
-              <div className="bg-gray-800 dark:bg-gray-700 text-white px-2 py-1 rounded shadow-lg text-xs font-medium whitespace-nowrap">
+              <div className="bg-gray-800 dark:bg-gray-700 text-white dark:text-gray-100 px-2 py-1 rounded shadow-lg text-xs font-medium whitespace-nowrap">
                 {content}
               </div>
             </motion.div>

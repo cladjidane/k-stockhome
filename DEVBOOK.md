@@ -153,6 +153,20 @@ Un composant réutilisable pour afficher des infobulles au survol des éléments
 ### Prochaines étapes
 - [ ] Ajouter des animations de transition entre les vues
 - [ ] Améliorer la visualisation des données nutritionnelles
+- [ ] Implémenter le partage de la liste de courses
+  - Utiliser l'API Web Share pour le partage natif sur mobile
+  - Format de partage : texte simple avec liste des articles
+  - Support du partage par SMS et autres applications
+- [ ] Optimiser les performances de recherche
+
+### Bugs connus
+- [ ] Le mode sombre ne fonctionne pas correctement avec les tooltips rendus via Portal
+
+### Partage de liste
+- [ ] Implémenter le partage de la liste de courses
+  - Utiliser l'API Web Share pour le partage natif sur mobile
+  - Format de partage : texte simple avec liste des articles
+  - Support du partage par SMS et autres applications
 
 ## Fonctionnalités complétées
 
@@ -248,7 +262,7 @@ src/
 - Support du mode sombre dans les animations
 
 ## Problèmes connus
-- Aucun pour le moment
+- [ ] Le mode sombre ne fonctionne pas correctement avec les tooltips rendus via Portal
 
 ## Ressources
 - [Documentation Open Food Facts API](https://world.openfoodfacts.org/data)

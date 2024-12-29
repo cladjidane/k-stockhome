@@ -24,6 +24,7 @@ export const dietMapping: { [key: string]: string } = {
   'sans lactose': 'Sans lactose',
   'faible en sel': 'Faible en sel',
   'sans sucre': 'Sans sucre',
+  bio: 'Agriculture biologique',
 };
 
 export const allergenMapping: { [key: string]: string } = {

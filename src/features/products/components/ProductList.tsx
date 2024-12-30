@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Product, ShoppingListItem } from '../types';
-import { groupProductsByCategory, MAIN_CATEGORIES } from '../utils/categoryUtils';
-import CategoryGroup from './CategoryGroup';
 import CategoryFilters from './CategoryFilters';
-import AnimatedTransition from './AnimatedTransition';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Product, ShoppingListItem } from '../../../types';
+import { groupProductsByCategory } from '../../../utils/categoryUtils';
+import AnimatedTransition from '../../../shared/components/AnimatedTransition';
+import CategoryGroup from '../../../components/CategoryGroup';
 
 interface ProductListProps {
   products: Product[];

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Package, ShoppingCart } from 'lucide-react';
-import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
+import { ThemeProvider } from './shared/contexts/ThemeContext';
+import ThemeToggle from './shared/components/ThemeToggle';
 import { Product, ShoppingListItem } from './types';
+import ShoppingList from './features/shopping-list/components/ShoppingList';
 import ProductForm from './components/ProductForm';
-import ProductList from './components/ProductList';
-import ShoppingList from './components/ShoppingList';
+import ProductList from './features/products/components/ProductList';
 
 function App() {
   const [products, setProducts] = useState<Product[]>(() => {

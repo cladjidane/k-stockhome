@@ -1,11 +1,11 @@
 import { Camera, Minus, Plus, X, PenLine } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Product } from '../types';
-import { getProductInfo } from '../utils/productUtils';
 import { useZxing } from 'react-zxing';
-import ErrorMessage from './ErrorMessage';
-import ManualProductForm from './ManualProductForm';
+import ErrorMessage from '../../../components/ErrorMessage';
+import ManualProductForm from '../../../components/ManualProductForm';
+import { Product } from '../../../types';
+import { getProductInfo } from '../../../utils/productUtils';
 
 interface BarcodeScannerProps {
   onProductFound: (product: Omit<Product, 'id'>) => void;

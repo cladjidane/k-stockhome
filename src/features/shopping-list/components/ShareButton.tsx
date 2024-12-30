@@ -1,7 +1,7 @@
 import React from 'react';
 import { Share } from 'lucide-react';
-import { Product } from '../types';
-import Tooltip from './Tooltip';
+import { Product } from '../../../types';
+import Tooltip from '../../../shared/components/Tooltip';
 
 interface ShareButtonProps {
   products: Product[];

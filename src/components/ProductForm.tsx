@@ -1,8 +1,8 @@
 import { Camera, Plus } from 'lucide-react';
 import React, { useState } from 'react';
 
-import BarcodeScanner from './BarcodeScanner';
 import { Product } from '../types';
+import BarcodeScanner from '../features/products/components/BarcodeScanner';
 
 interface ProductFormProps {
   onAdd: (product: Omit<Product, 'id'>) => void;

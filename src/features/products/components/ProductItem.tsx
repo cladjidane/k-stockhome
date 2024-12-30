@@ -10,8 +10,8 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { Product, ShoppingListItem } from '../types';
-import Tooltip from './Tooltip';
+import { Tooltip } from '../../../shared';
+import { Product, ShoppingListItem } from '../../../types';
 
 interface ProductItemProps {
   product: Product;

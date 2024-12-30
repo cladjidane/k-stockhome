@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Product } from '../types';
-import ProductItem from './ProductItem';
+import ProductItem from '../features/products/components/ProductItem';
 
 interface CategoryGroupProps {
   title: string;

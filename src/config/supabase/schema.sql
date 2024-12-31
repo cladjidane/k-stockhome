@@ -6,6 +6,8 @@ CREATE TABLE products (
   unit TEXT NOT NULL,
   location TEXT NOT NULL,
   category TEXT,
+  categories TEXT,
+  labels TEXT,
   nutriscore TEXT,
   nutriments JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

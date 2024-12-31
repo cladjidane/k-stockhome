@@ -157,9 +157,7 @@ export const useStore = create<ProductStore>((set, get) => ({
       }
 
       console.log('Successfully added to shopping list:', data);
-      set((state) => ({
-        shoppingList: [...state.shoppingList, data]
-      }));
+      await get().fetchShoppingList(); // Rafraîchir la liste après l'ajout
     } catch (error) {
       console.error('Error in addToShoppingList:', error);
       set({ error: (error as Error).message });

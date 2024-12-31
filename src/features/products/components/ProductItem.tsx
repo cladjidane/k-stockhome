@@ -1,9 +1,8 @@
+
 import {
   ChevronDown,
   ChevronUp,
   Trash2,
-  Plus,
-  Minus,
   Award,
   Leaf,
   AlertTriangle,
@@ -12,14 +11,13 @@ import {
 import React, { useState, useEffect } from "react";
 import { Tooltip } from "../../../shared";
 import { Product, ShoppingListItem } from "../../../types";
-import { create } from "zustand";
+import { useStore } from "../../../store/productStore";
 
 interface ProductItemProps {
   product: Product;
   onDelete: (id: string) => void;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onUpdateLocation: (id: string, location: string) => void;
-  onAddToShoppingList: (item: ShoppingListItem) => void;
 }
 
 const LOW_STOCK_THRESHOLD = 2;
@@ -41,51 +39,24 @@ const defaultLocationStyle = {
   icon: "📍",
 };
 
-interface StoreState {
-  products: Product[];
-  updateProduct: (id: string, updates: Partial<Product>) => void;
-  addProduct: (product: Product) => void;
-  addToShoppingList: (item: ShoppingListItem) => void;
-}
-
-const useStore = create<StoreState>()((set) => ({
-  products: [],
-  updateProduct: (id, updates) =>
-    set((state) => ({
-      products: state.products.map((product) =>
-        product.id === id ? { ...product, ...updates } : product,
-      ),
-    })),
-  addProduct: (product) =>
-    set((state) => ({ products: [...state.products, product] })),
-  addToShoppingList: (item) => console.log("Added to shopping list:", item), // Placeholder - needs actual shopping list management
-}));
-
 export default function ProductItem({
   product,
-  onDelete
+  onDelete,
+  onUpdateQuantity,
+  onUpdateLocation
 }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
-  const locationStyle =
-    locationColors[product.location] || defaultLocationStyle;
-  const { updateProduct, addToShoppingList } = useStore();
+  const locationStyle = locationColors[product.location] || defaultLocationStyle;
+  const { addToShoppingList } = useStore();
 
   useEffect(() => {
     setShowLowStockAlert(product.quantity <= LOW_STOCK_THRESHOLD);
   }, [product.quantity]);
 
-  const handleQuantityChange = (increment: boolean) => {
-    const newQuantity = increment
-      ? product.quantity + 1
-      : Math.max(0, product.quantity - 1);
-    updateProduct(product.id, { quantity: newQuantity });
-  };
-
   const handleAddToShoppingList = () => {
     addToShoppingList({
-      id: crypto.randomUUID(),
-      productId: product.id,
+      product_id: product.id,
       name: product.name,
       quantity: 1,
       unit: product.unit,

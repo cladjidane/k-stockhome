@@ -61,7 +61,7 @@ export default function ProductItem({
       quantity: 1,
       unit: product.unit,
     });
-    setShowLowStockAlert(false);
+    // L'alerte reste visible tant que le stock est bas
   };
 
   const renderNutriscore = () => {

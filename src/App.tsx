@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Package, ShoppingCart, Menu } from "lucide-react";
 import { ThemeProvider } from "./shared/contexts/ThemeContext";
@@ -25,19 +26,15 @@ function App() {
     removeProduct,
     removeFromShoppingList,
     updateShoppingItem,
-    getFilteredProducts,
     addToShoppingList,
   } = useStore();
 
-  const [showScanner, setShowScanner] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("pantry-products", JSON.stringify(products));
   }, [products]);
-
-  const filteredProducts = getFilteredProducts();
 
   return (
     <ThemeProvider>
@@ -71,7 +68,7 @@ function App() {
 
           <div className="max-w-md mx-auto">
             {!showCategories && !showCart && (
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
                 <ProductForm
                   onAdd={addProduct}
                   products={products}
@@ -90,7 +87,7 @@ function App() {
             )}
 
             {showCategories && (
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <ProductList
                   products={products}
                   onUpdateQuantity={(id, quantity) =>
@@ -105,8 +102,8 @@ function App() {
               </div>
             )}
 
-            {showCart ? (
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+            {showCart && (
+              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <ShoppingList
                   items={shoppingList}
                   products={products}
@@ -116,20 +113,6 @@ function App() {
                   onRemoveItem={removeFromShoppingList}
                   onUpdateProduct={updateProduct}
                   onPurchaseComplete={removeFromShoppingList}
-                />
-              </div>
-            ) : (
-              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <ProductList
-                  products={products}
-                  onUpdateQuantity={(id, quantity) =>
-                    updateProduct(id, { quantity })
-                  }
-                  onUpdateLocation={(id, location) =>
-                    updateProduct(id, { location })
-                  }
-                  onDelete={removeProduct}
-                  onAddToShoppingList={addToShoppingList}
                 />
               </div>
             )}

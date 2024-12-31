@@ -38,9 +38,9 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between mb-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-between mb-12">
             <button
               onClick={() => setShowCategories(!showCategories)}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
@@ -66,9 +66,9 @@ function App() {
             </div>
           </div>
 
-          <div className="max-w-md mx-auto">
+          <div className="max-w-2xl mx-auto">
             {!showCategories && !showCart && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <ProductForm
                   onAdd={addProduct}
                   products={products}
@@ -87,7 +87,7 @@ function App() {
             )}
 
             {showCategories && (
-              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div className="mt-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <ProductList
                   products={products}
                   onUpdateQuantity={(id, quantity) =>
@@ -103,7 +103,7 @@ function App() {
             )}
 
             {showCart && (
-              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+              <div className="mt-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                 <ShoppingList
                   items={shoppingList}
                   products={products}

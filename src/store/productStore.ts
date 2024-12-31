@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -16,9 +15,14 @@ interface ProductStore {
   removeProduct: (id: string) => Promise<void>;
   setSelectedCategory: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
-  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => Promise<void>;
+  addToShoppingList: (
+    item: Omit<ShoppingListItem, "id" | "addedAt">,
+  ) => Promise<void>;
   removeFromShoppingList: (id: string) => Promise<void>;
-  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => Promise<void>;
+  updateShoppingItem: (
+    id: string,
+    updates: Partial<ShoppingListItem>,
+  ) => Promise<void>;
   getFilteredProducts: () => Product[];
 }
 
@@ -53,53 +57,57 @@ export const useStore = create<ProductStore>((set, get) => ({
   },
 
   addToShoppingList: async (item) => {
-    console.log('Adding item to shopping list:', item);
+    console.log("Adding item to shopping list:", item);
     try {
+      console.log(item);
       const { data, error } = await supabase
         .from("shopping_list")
-        .insert([{
-          product_id: item.id,
-          name: item.name,
-          quantity: item.quantity || 1,
-          unit: item.unit,
-          auto_update_stock: true
-        }])
+        .insert([
+          {
+            product_id: item.id,
+            name: item.name,
+            quantity: item.quantity || 1,
+            unit: item.unit,
+            auto_update_stock: true,
+          },
+        ])
         .select()
         .single();
-      
+
       if (error) {
-        console.error('Error adding to shopping list:', error);
+        console.error("Error adding to shopping list:", error);
         throw error;
       }
-      
-      console.log('Successfully added to shopping list:', data);
+
+      console.log("Successfully added to shopping list:", data);
       set((state) => ({
-        shoppingList: [...state.shoppingList, data]
+        shoppingList: [...state.shoppingList, data],
       }));
     } catch (error) {
-      console.error('Caught error:', error);
+      console.log(error);
+      console.error("Caught error:", error);
       set({ error: (error as Error).message });
     }
   },
 
   addProduct: async (product) => {
-    console.log('Attempting to add product:', product);
+    console.log("Attempting to add product:", product);
     try {
       const { data, error } = await supabase
         .from("products")
         .insert([product])
         .select()
         .single();
-      
+
       if (error) {
-        console.error('Error adding product:', error);
+        console.error("Error adding product:", error);
         throw error;
       }
-      
-      console.log('Product added successfully:', data);
+
+      console.log("Product added successfully:", data);
       set((state) => ({ products: [...state.products, data] }));
     } catch (error) {
-      console.error('Caught error while adding product:', error);
+      console.error("Caught error while adding product:", error);
       set({ error: (error as Error).message });
     }
   },
@@ -113,7 +121,7 @@ export const useStore = create<ProductStore>((set, get) => ({
       if (error) throw error;
       set((state) => ({
         products: state.products.map((p) =>
-          p.id === id ? { ...p, ...updates } : p
+          p.id === id ? { ...p, ...updates } : p,
         ),
       }));
     } catch (error) {
@@ -137,29 +145,31 @@ export const useStore = create<ProductStore>((set, get) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
 
   addToShoppingList: async (item) => {
-    console.log('Adding to shopping list:', item);
+    console.log("Adding to shopping list:", item);
     try {
       const { data, error } = await supabase
         .from("shopping_list")
-        .insert([{
-          product_id: item.id,
-          name: item.name,
-          quantity: 1,
-          unit: item.unit,
-          auto_update_stock: true
-        }])
+        .insert([
+          {
+            product_id: item.id,
+            name: item.name,
+            quantity: 1,
+            unit: item.unit,
+            auto_update_stock: true,
+          },
+        ])
         .select()
         .single();
 
       if (error) {
-        console.error('Error adding to shopping list:', error);
+        console.error("Error adding to shopping list:", error);
         throw error;
       }
 
-      console.log('Successfully added to shopping list:', data);
+      console.log("Successfully added to shopping list:", data);
       await get().fetchShoppingList(); // Rafraîchir la liste après l'ajout
     } catch (error) {
-      console.error('Error in addToShoppingList:', error);
+      console.error("Error in addToShoppingList:", error);
       set({ error: (error as Error).message });
     }
   },
@@ -169,10 +179,10 @@ export const useStore = create<ProductStore>((set, get) => ({
     try {
       const { data, error } = await supabase.from("shopping_list").select("*");
       if (error) throw error;
-      console.log('Fetched shopping list:', data);
+      console.log("Fetched shopping list:", data);
       set({ shoppingList: data, isLoading: false });
     } catch (error) {
-      console.error('Error fetching shopping list:', error);
+      console.error("Error fetching shopping list:", error);
       set({ error: (error as Error).message, isLoading: false });
     }
   },
@@ -201,7 +211,7 @@ export const useStore = create<ProductStore>((set, get) => ({
       if (error) throw error;
       set((state) => ({
         shoppingList: state.shoppingList.map((i) =>
-          i.id === id ? { ...i, ...updates } : i
+          i.id === id ? { ...i, ...updates } : i,
         ),
       }));
     } catch (error) {

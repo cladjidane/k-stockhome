@@ -63,10 +63,7 @@ const useStore = create<StoreState>()((set) => ({
 
 export default function ProductItem({
   product,
-  onDelete,
-  onUpdateQuantity,
-  onUpdateLocation,
-  onAddToShoppingList,
+  onDelete
 }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);

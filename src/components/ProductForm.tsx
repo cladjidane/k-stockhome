@@ -14,6 +14,7 @@ export default function ProductForm({ onAdd, products, onUpdateQuantity }: Produ
   const [showScanner, setShowScanner] = useState(false);
 
   const handleProductScanned = (scannedProduct: Omit<Product, 'id'>) => {
+    console.log('Product scanned:', scannedProduct);
     const productWithDefaults = {
       name: '',
       quantity: 1,
@@ -25,6 +26,7 @@ export default function ProductForm({ onAdd, products, onUpdateQuantity }: Produ
       categories: scannedProduct.categories
     };
     
+    console.log('Sending product to store:', productWithDefaults);
     onAdd(productWithDefaults);
     setShowScanner(false);
   };

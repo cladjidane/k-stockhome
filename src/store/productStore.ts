@@ -42,15 +42,23 @@ export const useStore = create<ProductStore>((set, get) => ({
   },
 
   addProduct: async (product) => {
+    console.log('Attempting to add product:', product);
     try {
       const { data, error } = await supabase
         .from("products")
         .insert([product])
         .select()
         .single();
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Error adding product:', error);
+        throw error;
+      }
+      
+      console.log('Product added successfully:', data);
       set((state) => ({ products: [...state.products, data] }));
     } catch (error) {
+      console.error('Caught error while adding product:', error);
       set({ error: (error as Error).message });
     }
   },

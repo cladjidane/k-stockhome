@@ -166,6 +166,19 @@ export const useStore = create<ProductStore>((set, get) => ({
     }
   },
 
+  fetchShoppingList: async () => {
+    set({ isLoading: true });
+    try {
+      const { data, error } = await supabase.from("shopping_list").select("*");
+      if (error) throw error;
+      console.log('Fetched shopping list:', data);
+      set({ shoppingList: data, isLoading: false });
+    } catch (error) {
+      console.error('Error fetching shopping list:', error);
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
   removeFromShoppingList: async (id) => {
     try {
       const { error } = await supabase

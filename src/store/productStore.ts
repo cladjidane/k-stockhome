@@ -126,17 +126,31 @@ export const useStore = create<ProductStore>((set, get) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
 
   addToShoppingList: async (item) => {
+    console.log('Adding to shopping list:', item);
     try {
       const { data, error } = await supabase
         .from("shopping_list")
-        .insert([item])
+        .insert([{
+          product_id: item.id,
+          name: item.name,
+          quantity: 1,
+          unit: item.unit,
+          auto_update_stock: true
+        }])
         .select()
         .single();
-      if (error) throw error;
+
+      if (error) {
+        console.error('Error adding to shopping list:', error);
+        throw error;
+      }
+
+      console.log('Successfully added to shopping list:', data);
       set((state) => ({
-        shoppingList: [...state.shoppingList, data],
+        shoppingList: [...state.shoppingList, data]
       }));
     } catch (error) {
+      console.error('Error in addToShoppingList:', error);
       set({ error: (error as Error).message });
     }
   },

@@ -7,12 +7,12 @@ import {
   Award,
   Leaf,
   AlertTriangle,
-  ShoppingCart
-} from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-import { Tooltip } from '../../../shared';
-import { Product, ShoppingListItem } from '../../../types';
-import create from 'zustand';
+  ShoppingCart,
+} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Tooltip } from "../../../shared";
+import { Product, ShoppingListItem } from "../../../types";
+import { create } from "zustand";
 
 interface ProductItemProps {
   product: Product;
@@ -24,15 +24,22 @@ interface ProductItemProps {
 
 const LOW_STOCK_THRESHOLD = 2;
 
-const locationColors: Record<string, { bg: string; text: string; icon: string }> = {
-  'Placard cuisine': { bg: 'bg-amber-50', text: 'text-amber-700', icon: '🪟' },
-  'Réfrigérateur': { bg: 'bg-blue-50', text: 'text-blue-700', icon: '❄️' },
-  'Congélateur': { bg: 'bg-indigo-50', text: 'text-indigo-700', icon: '🧊' },
-  'Garde-manger': { bg: 'bg-green-50', text: 'text-green-700', icon: '🏠' },
-  'Boîte à pain': { bg: 'bg-orange-50', text: 'text-orange-700', icon: '🍞' },
+const locationColors: Record<
+  string,
+  { bg: string; text: string; icon: string }
+> = {
+  "Placard cuisine": { bg: "bg-amber-50", text: "text-amber-700", icon: "🪟" },
+  Réfrigérateur: { bg: "bg-blue-50", text: "text-blue-700", icon: "❄️" },
+  Congélateur: { bg: "bg-indigo-50", text: "text-indigo-700", icon: "🧊" },
+  "Garde-manger": { bg: "bg-green-50", text: "text-green-700", icon: "🏠" },
+  "Boîte à pain": { bg: "bg-orange-50", text: "text-orange-700", icon: "🍞" },
 };
 
-const defaultLocationStyle = { bg: 'bg-gray-50', text: 'text-gray-700', icon: '📍' };
+const defaultLocationStyle = {
+  bg: "bg-gray-50",
+  text: "text-gray-700",
+  icon: "📍",
+};
 
 interface StoreState {
   products: Product[];
@@ -46,24 +53,25 @@ const useStore = create<StoreState>()((set) => ({
   updateProduct: (id, updates) =>
     set((state) => ({
       products: state.products.map((product) =>
-        product.id === id ? { ...product, ...updates } : product
+        product.id === id ? { ...product, ...updates } : product,
       ),
     })),
-  addProduct: (product) => set((state) => ({ products: [...state.products, product] })),
-  addToShoppingList: (item) => console.log("Added to shopping list:", item) // Placeholder - needs actual shopping list management
+  addProduct: (product) =>
+    set((state) => ({ products: [...state.products, product] })),
+  addToShoppingList: (item) => console.log("Added to shopping list:", item), // Placeholder - needs actual shopping list management
 }));
-
 
 export default function ProductItem({
   product,
   onDelete,
   onUpdateQuantity,
   onUpdateLocation,
-  onAddToShoppingList
+  onAddToShoppingList,
 }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
-  const locationStyle = locationColors[product.location] || defaultLocationStyle;
+  const locationStyle =
+    locationColors[product.location] || defaultLocationStyle;
   const { updateProduct, addToShoppingList } = useStore();
 
   useEffect(() => {
@@ -71,7 +79,9 @@ export default function ProductItem({
   }, [product.quantity]);
 
   const handleQuantityChange = (increment: boolean) => {
-    const newQuantity = increment ? product.quantity + 1 : Math.max(0, product.quantity - 1);
+    const newQuantity = increment
+      ? product.quantity + 1
+      : Math.max(0, product.quantity - 1);
     updateProduct(product.id, { quantity: newQuantity });
   };
 
@@ -81,7 +91,7 @@ export default function ProductItem({
       productId: product.id,
       name: product.name,
       quantity: 1,
-      unit: product.unit
+      unit: product.unit,
     });
     setShowLowStockAlert(false);
   };
@@ -89,26 +99,32 @@ export default function ProductItem({
   const renderNutriscore = () => {
     if (!product.nutriscore) return null;
     const colors: Record<string, string> = {
-      'a': 'bg-green-500',
-      'b': 'bg-lime-500',
-      'c': 'bg-yellow-500',
-      'd': 'bg-orange-500',
-      'e': 'bg-red-500'
+      a: "bg-green-500",
+      b: "bg-lime-500",
+      c: "bg-yellow-500",
+      d: "bg-orange-500",
+      e: "bg-red-500",
     };
     const descriptions: Record<string, string> = {
-      'a': 'Excellente qualité nutritionnelle',
-      'b': 'Bonne qualité nutritionnelle',
-      'c': 'Qualité nutritionnelle moyenne',
-      'd': 'Qualité nutritionnelle insuffisante',
-      'e': 'Mauvaise qualité nutritionnelle'
+      a: "Excellente qualité nutritionnelle",
+      b: "Bonne qualité nutritionnelle",
+      c: "Qualité nutritionnelle moyenne",
+      d: "Qualité nutritionnelle insuffisante",
+      e: "Mauvaise qualité nutritionnelle",
     };
-    const bgColor = colors[product.nutriscore.toLowerCase()] || 'bg-gray-500';
+    const bgColor = colors[product.nutriscore.toLowerCase()] || "bg-gray-500";
 
     return (
-      <Tooltip content={descriptions[product.nutriscore.toLowerCase()] || 'Nutri-Score'}>
+      <Tooltip
+        content={
+          descriptions[product.nutriscore.toLowerCase()] || "Nutri-Score"
+        }
+      >
         <div className="flex items-center gap-1">
           <Award className="w-4 h-4 text-gray-500" />
-          <span className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${bgColor}`}>
+          <span
+            className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${bgColor}`}
+          >
             {product.nutriscore.toUpperCase()}
           </span>
         </div>
@@ -157,7 +173,9 @@ export default function ProductItem({
               </div>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <div className={`inline-flex items-center px-2 py-1 rounded-md ${locationStyle.bg} ${locationStyle.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}>
+              <div
+                className={`inline-flex items-center px-2 py-1 rounded-md ${locationStyle.bg} ${locationStyle.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
+              >
                 <span className="mr-1">{locationStyle.icon}</span>
                 {product.location}
               </div>
@@ -178,12 +196,20 @@ export default function ProductItem({
                 </button>
               </div>
             </Tooltip>
-            <Tooltip content={isExpanded ? "Masquer les informations nutritionnelles" : "Voir les informations nutritionnelles"}>
+            <Tooltip
+              content={
+                isExpanded
+                  ? "Masquer les informations nutritionnelles"
+                  : "Voir les informations nutritionnelles"
+              }
+            >
               <div className="relative">
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
-                  aria-label={isExpanded ? "Masquer les détails" : "Voir les détails"}
+                  aria-label={
+                    isExpanded ? "Masquer les détails" : "Voir les détails"
+                  }
                 >
                   {isExpanded ? (
                     <ChevronUp className="w-5 h-5" />
@@ -201,19 +227,27 @@ export default function ProductItem({
         <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-4 gap-4 text-sm">
             <div className="text-center">
-              <div className="font-medium text-gray-900 dark:text-white">{product.nutriments.energy_100g}</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {product.nutriments.energy_100g}
+              </div>
               <div className="text-gray-500 dark:text-gray-400">kcal/100g</div>
             </div>
             <div className="text-center">
-              <div className="font-medium text-gray-900 dark:text-white">{product.nutriments.proteins_100g}g</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {product.nutriments.proteins_100g}g
+              </div>
               <div className="text-gray-500 dark:text-gray-400">Protéines</div>
             </div>
             <div className="text-center">
-              <div className="font-medium text-gray-900 dark:text-white">{product.nutriments.carbohydrates_100g}g</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {product.nutriments.carbohydrates_100g}g
+              </div>
               <div className="text-gray-500 dark:text-gray-400">Glucides</div>
             </div>
             <div className="text-center">
-              <div className="font-medium text-gray-900 dark:text-white">{product.nutriments.fat_100g}g</div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {product.nutriments.fat_100g}g
+              </div>
               <div className="text-gray-500 dark:text-gray-400">Lipides</div>
             </div>
           </div>

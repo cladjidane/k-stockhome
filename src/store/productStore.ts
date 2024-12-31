@@ -147,6 +147,18 @@ export const useStore = create<ProductStore>((set, get) => ({
   addToShoppingList: async (item) => {
     console.log("Adding to shopping list:", item);
     try {
+      // Vérifier si le produit existe déjà
+      const { data: existing } = await supabase
+        .from("shopping_list")
+        .select()
+        .eq('product_id', item.id)
+        .single();
+
+      if (existing) {
+        console.log('Item already in shopping list');
+        return;
+      }
+
       const { data, error } = await supabase
         .from("shopping_list")
         .insert([

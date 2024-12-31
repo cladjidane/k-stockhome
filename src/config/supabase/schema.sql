@@ -1,5 +1,5 @@
 
-ALTER TABLE products 
+ALTER TABLE shopping_list 
 ADD COLUMN IF NOT EXISTS categories TEXT,
 ADD COLUMN IF NOT EXISTS labels TEXT;
 

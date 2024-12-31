@@ -13,10 +13,13 @@ function App() {
     shoppingList,
     searchQuery,
     setSearchQuery,
+    addProduct,
     updateProduct,
+    removeProduct,
     removeFromShoppingList,
     updateShoppingItem,
     getFilteredProducts,
+    addToShoppingList,
   } = useStore();
 
   const [showScanner, setShowScanner] = useState(false);

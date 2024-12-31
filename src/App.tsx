@@ -105,7 +105,7 @@ function App() {
               </div>
             )}
 
-            {showCart && (
+            {showCart ? (
               <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <ShoppingList
                   items={shoppingList}

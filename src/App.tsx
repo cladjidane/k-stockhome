@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Package, ShoppingCart, Menu } from 'lucide-react';
 import { ThemeProvider } from './shared/contexts/ThemeContext';
 import ThemeToggle from './shared/components/ThemeToggle';
@@ -7,12 +7,20 @@ import { Product } from './types';
 import ProductForm from './components/ProductForm';
 import ProductList from './features/products/components/ProductList';
 import ShoppingList from './features/shopping-list/components/ShoppingList';
-import { useShoppingList } from './features/shopping-list/hooks/useShoppingList';
+import { useStore } from './store/productStore';
 
 function App() {
-  const { products, shoppingList, updateProduct, removeFromShoppingList, updateShoppingItem } = useStore();
+  const { 
+    products, 
+    shoppingList, 
+    searchQuery,
+    setSearchQuery,
+    updateProduct,
+    removeFromShoppingList,
+    updateShoppingItem,
+    getFilteredProducts
+  } = useStore();
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [showCategories, setShowCategories] = useState(false);
   const [showCart, setShowCart] = useState(false);
@@ -21,22 +29,7 @@ function App() {
     localStorage.setItem('pantry-products', JSON.stringify(products));
   }, [products]);
 
-  const handleAddProduct = (newProduct: Omit<Product, 'id'>) => {
-    setProducts(prev => [...prev, {
-      ...newProduct,
-      id: crypto.randomUUID()
-    }]);
-  };
-
-  const handleUpdateQuantity = (id: string, quantity: number) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id ? { ...p, quantity } : p
-    ));
-  };
-
-  const filteredProducts = searchTerm
-    ? products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : [];
+  const filteredProducts = getFilteredProducts();
 
   return (
     <ThemeProvider>
@@ -70,8 +63,8 @@ function App() {
             <input
               type="text"
               placeholder="Rechercher un produit..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
             />
             
@@ -80,10 +73,10 @@ function App() {
                 <h2 className="text-lg font-medium mb-4">Catégories</h2>
                 <ProductList
                   products={products}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  onUpdateLocation={(id, location) => {}}
-                  onDelete={() => {}}
-                  onAddToShoppingList={() => {}}
+                  onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
+                  onUpdateLocation={(id, location) => updateProduct(id, { location })}
+                  onDelete={removeProduct}
+                  onAddToShoppingList={addToShoppingList}
                 />
               </div>
             )}
@@ -92,30 +85,30 @@ function App() {
               <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <h2 className="text-lg font-medium mb-4">Liste de courses</h2>
                 <ShoppingList
-                  items={items}
+                  items={shoppingList}
                   products={products}
-                  onUpdateQuantity={(id, quantity) => updateItem(id, { quantity })}
-                  onRemoveItem={removeItem}
-                  onUpdateProduct={handleUpdateQuantity}
-                  onPurchaseComplete={removeItem}
+                  onUpdateQuantity={(id, quantity) => updateShoppingItem(id, { quantity })}
+                  onRemoveItem={removeFromShoppingList}
+                  onUpdateProduct={updateProduct}
+                  onPurchaseComplete={removeFromShoppingList}
                 />
               </div>
             )}
 
             <ProductForm
-              onAdd={handleAddProduct}
+              onAdd={addProduct}
               products={products}
-              onUpdateQuantity={handleUpdateQuantity}
+              onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
             />
 
-            {searchTerm && filteredProducts.length > 0 && (
+            {searchQuery && filteredProducts.length > 0 && (
               <div className="mt-4">
                 <ProductList
                   products={filteredProducts}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  onUpdateLocation={(id, location) => {}}
-                  onDelete={() => {}}
-                  onAddToShoppingList={() => {}}
+                  onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
+                  onUpdateLocation={(id, location) => updateProduct(id, { location })}
+                  onDelete={removeProduct}
+                  onAddToShoppingList={addToShoppingList}
                 />
               </div>
             )}

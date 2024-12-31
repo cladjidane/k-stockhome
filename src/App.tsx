@@ -7,8 +7,10 @@ import { Product } from './types';
 import ProductForm from './components/ProductForm';
 import ProductList from './features/products/components/ProductList';
 import ShoppingList from './features/shopping-list/components/ShoppingList';
+import { useShoppingList } from './features/shopping-list/hooks/useShoppingList';
 
 function App() {
+  const { items, addItem, removeItem, updateItem, clearList } = useShoppingList();
   const [products, setProducts] = useState<Product[]>(() => {
     const saved = localStorage.getItem('pantry-products');
     return saved ? JSON.parse(saved) : [];
@@ -94,12 +96,12 @@ function App() {
               <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <h2 className="text-lg font-medium mb-4">Liste de courses</h2>
                 <ShoppingList
-                  items={[]}
+                  items={items}
                   products={products}
-                  onUpdateQuantity={() => {}}
-                  onRemoveItem={() => {}}
-                  onUpdateProduct={() => {}}
-                  onPurchaseComplete={() => {}}
+                  onUpdateQuantity={(id, quantity) => updateItem(id, { quantity })}
+                  onRemoveItem={removeItem}
+                  onUpdateProduct={handleUpdateQuantity}
+                  onPurchaseComplete={removeItem}
                 />
               </div>
             )}

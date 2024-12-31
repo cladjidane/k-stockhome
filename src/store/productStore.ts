@@ -1,4 +1,4 @@
-import { create } from "zustand/vanilla";
+import { createStore } from "zustand/vanilla";
 import { Product, ShoppingListItem } from "../types";
 
 interface ProductStore {
@@ -17,7 +17,7 @@ interface ProductStore {
   getFilteredProducts: () => Product[];
 }
 
-export const useStore = create<ProductStore>((set, get) => ({
+export const useStore = createStore<ProductStore>((set, get) => ({
   products: [],
   shoppingList: [],
   selectedCategory: null,

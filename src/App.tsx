@@ -8,6 +8,12 @@ import ShoppingList from "./features/shopping-list/components/ShoppingList";
 import { useStore } from "./store/productStore";
 
 function App() {
+  const { fetchProducts } = useStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   const {
     products,
     shoppingList,

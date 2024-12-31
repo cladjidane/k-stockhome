@@ -1,19 +1,24 @@
+
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
+import { supabase } from "../config/supabase/client";
 
 interface ProductStore {
   products: Product[];
   shoppingList: ShoppingListItem[];
   selectedCategory: string | null;
   searchQuery: string;
-  addProduct: (product: Omit<Product, "id">) => void;
-  updateProduct: (id: string, updates: Partial<Product>) => void;
-  removeProduct: (id: string) => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchProducts: () => Promise<void>;
+  addProduct: (product: Omit<Product, "id">) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  removeProduct: (id: string) => Promise<void>;
   setSelectedCategory: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
-  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => void;
-  removeFromShoppingList: (id: string) => void;
-  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => void;
+  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => Promise<void>;
+  removeFromShoppingList: (id: string) => Promise<void>;
+  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => Promise<void>;
   getFilteredProducts: () => Product[];
 }
 
@@ -22,51 +27,113 @@ export const useStore = create<ProductStore>((set, get) => ({
   shoppingList: [],
   selectedCategory: null,
   searchQuery: "",
+  isLoading: false,
+  error: null,
 
-  addProduct: (product) =>
-    set((state) => ({
-      products: [...state.products, { ...product, id: crypto.randomUUID() }],
-    })),
+  fetchProducts: async () => {
+    set({ isLoading: true });
+    try {
+      const { data, error } = await supabase.from("products").select("*");
+      if (error) throw error;
+      set({ products: data, isLoading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
 
-  updateProduct: (id, updates) =>
-    set((state) => ({
-      products: state.products.map((p) =>
-        p.id === id ? { ...p, ...updates } : p,
-      ),
-    })),
+  addProduct: async (product) => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .insert([product])
+        .select()
+        .single();
+      if (error) throw error;
+      set((state) => ({ products: [...state.products, data] }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
-  removeProduct: (id) =>
-    set((state) => ({
-      products: state.products.filter((p) => p.id !== id),
-    })),
+  updateProduct: async (id, updates) => {
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update(updates)
+        .eq("id", id);
+      if (error) throw error;
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === id ? { ...p, ...updates } : p
+        ),
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
+
+  removeProduct: async (id) => {
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== id),
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
   setSelectedCategory: (category) => set({ selectedCategory: category }),
-
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  addToShoppingList: (item) =>
-    set((state) => ({
-      shoppingList: [
-        ...state.shoppingList,
-        {
-          ...item,
-          id: crypto.randomUUID(),
-          addedAt: new Date(),
-        },
-      ],
-    })),
+  addToShoppingList: async (item) => {
+    try {
+      const { data, error } = await supabase
+        .from("shopping_list")
+        .insert([item])
+        .select()
+        .single();
+      if (error) throw error;
+      set((state) => ({
+        shoppingList: [...state.shoppingList, data],
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
-  removeFromShoppingList: (id) =>
-    set((state) => ({
-      shoppingList: state.shoppingList.filter((i) => i.id !== id),
-    })),
+  removeFromShoppingList: async (id) => {
+    try {
+      const { error } = await supabase
+        .from("shopping_list")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+      set((state) => ({
+        shoppingList: state.shoppingList.filter((i) => i.id !== id),
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
-  updateShoppingItem: (id, updates) =>
-    set((state) => ({
-      shoppingList: state.shoppingList.map((i) =>
-        i.id === id ? { ...i, ...updates } : i,
-      ),
-    })),
+  updateShoppingItem: async (id, updates) => {
+    try {
+      const { error } = await supabase
+        .from("shopping_list")
+        .update(updates)
+        .eq("id", id);
+      if (error) throw error;
+      set((state) => ({
+        shoppingList: state.shoppingList.map((i) =>
+          i.id === id ? { ...i, ...updates } : i
+        ),
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
   getFilteredProducts: () => {
     const { products, selectedCategory, searchQuery } = get();

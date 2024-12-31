@@ -69,35 +69,26 @@ function App() {
             </div>
           </div>
 
-          <div className="max-w-md mx-auto space-y-4">
-            <input
-              type="text"
-              placeholder="Rechercher un produit..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
+          <div className="max-w-md mx-auto">
+            <div className="flex items-center gap-4 mb-4">
+              <ProductForm
+                onAdd={addProduct}
+                products={products}
+                onUpdateQuantity={(id, quantity) =>
+                  updateProduct(id, { quantity })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Rechercher un produit..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+              />
+            </div>
 
-            {showCategories && (
-              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <h2 className="text-lg font-medium mb-4">Catégories</h2>
-                <ProductList
-                  products={products}
-                  onUpdateQuantity={(id, quantity) =>
-                    updateProduct(id, { quantity })
-                  }
-                  onUpdateLocation={(id, location) =>
-                    updateProduct(id, { location })
-                  }
-                  onDelete={removeProduct}
-                  onAddToShoppingList={addToShoppingList}
-                />
-              </div>
-            )}
-
-            {showCart && (
-              <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-                <h2 className="text-lg font-medium mb-4">Liste de courses</h2>
+            {showCart ? (
+              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <ShoppingList
                   items={shoppingList}
                   products={products}
@@ -109,20 +100,10 @@ function App() {
                   onPurchaseComplete={removeFromShoppingList}
                 />
               </div>
-            )}
-
-            <ProductForm
-              onAdd={addProduct}
-              products={products}
-              onUpdateQuantity={(id, quantity) =>
-                updateProduct(id, { quantity })
-              }
-            />
-
-            {searchQuery && filteredProducts.length > 0 && (
-              <div className="mt-4">
+            ) : (
+              <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
                 <ProductList
-                  products={filteredProducts}
+                  products={products}
                   onUpdateQuantity={(id, quantity) =>
                     updateProduct(id, { quantity })
                   }

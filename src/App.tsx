@@ -10,11 +10,7 @@ import ShoppingList from './features/shopping-list/components/ShoppingList';
 import { useShoppingList } from './features/shopping-list/hooks/useShoppingList';
 
 function App() {
-  const { items, addItem, removeItem, updateItem, clearList } = useShoppingList();
-  const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('pantry-products');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const { products, shoppingList, updateProduct, removeFromShoppingList, updateShoppingItem } = useStore();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showScanner, setShowScanner] = useState(false);

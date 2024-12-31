@@ -12,6 +12,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { Tooltip } from '../../../shared';
 import { Product, ShoppingListItem } from '../../../types';
+import create from 'zustand';
 
 interface ProductItemProps {
   product: Product;
@@ -33,6 +34,26 @@ const locationColors: Record<string, { bg: string; text: string; icon: string }>
 
 const defaultLocationStyle = { bg: 'bg-gray-50', text: 'text-gray-700', icon: '📍' };
 
+interface StoreState {
+  products: Product[];
+  updateProduct: (id: string, updates: Partial<Product>) => void;
+  addProduct: (product: Product) => void;
+  addToShoppingList: (item: ShoppingListItem) => void;
+}
+
+const useStore = create<StoreState>()((set) => ({
+  products: [],
+  updateProduct: (id, updates) =>
+    set((state) => ({
+      products: state.products.map((product) =>
+        product.id === id ? { ...product, ...updates } : product
+      ),
+    })),
+  addProduct: (product) => set((state) => ({ products: [...state.products, product] })),
+  addToShoppingList: (item) => console.log("Added to shopping list:", item) // Placeholder - needs actual shopping list management
+}));
+
+
 export default function ProductItem({
   product,
   onDelete,
@@ -43,6 +64,7 @@ export default function ProductItem({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationStyle = locationColors[product.location] || defaultLocationStyle;
+  const { updateProduct, addToShoppingList } = useStore();
 
   useEffect(() => {
     setShowLowStockAlert(product.quantity <= LOW_STOCK_THRESHOLD);
@@ -50,11 +72,11 @@ export default function ProductItem({
 
   const handleQuantityChange = (increment: boolean) => {
     const newQuantity = increment ? product.quantity + 1 : Math.max(0, product.quantity - 1);
-    onUpdateQuantity(product.id, newQuantity);
+    updateProduct(product.id, { quantity: newQuantity });
   };
 
   const handleAddToShoppingList = () => {
-    onAddToShoppingList({
+    addToShoppingList({
       id: crypto.randomUUID(),
       productId: product.id,
       name: product.name,
@@ -81,7 +103,7 @@ export default function ProductItem({
       'e': 'Mauvaise qualité nutritionnelle'
     };
     const bgColor = colors[product.nutriscore.toLowerCase()] || 'bg-gray-500';
-    
+
     return (
       <Tooltip content={descriptions[product.nutriscore.toLowerCase()] || 'Nutri-Score'}>
         <div className="flex items-center gap-1">
@@ -144,7 +166,7 @@ export default function ProductItem({
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-2">
             <Tooltip content="Supprimer le produit">
               <div className="relative">

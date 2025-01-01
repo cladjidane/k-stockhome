@@ -110,11 +110,11 @@ export default function ProductItem({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-visible transition-all duration-200 hover:shadow-md">
       {showLowStockAlert && (
-        <div className="absolute top-2 right-16">
+        <div className="absolute top-4 right-20">
           <Tooltip content="Stock bas - Ajouter au panier">
             <button
               onClick={handleAddToShoppingList}
-              className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors"
+              className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors shadow-sm"
             >
               <AlertTriangle className="w-4 h-4" />
             </button>

@@ -171,10 +171,33 @@ export const useStore = create<ProductStore>((set, get) => ({
     return products.filter((product) => {
       const matchesCategory =
         !selectedCategory || product.category === selectedCategory;
-      const matchesSearch =
-        !searchQuery ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      
+      if (!searchQuery) return matchesCategory;
+      
+      const query = searchQuery.toLowerCase();
+      const name = product.name.toLowerCase();
+      
+      // Vérifie si le nom commence par la recherche
+      const startsWithMatch = name.startsWith(query);
+      // Vérifie si le nom contient les mots de la recherche
+      const containsMatch = query.split(' ').every(word => 
+        name.includes(word.toLowerCase())
+      );
+      
+      return matchesCategory && (startsWithMatch || containsMatch);
     });
+  },
+
+  getSuggestions: (query: string) => {
+    const { products } = get();
+    if (!query) return [];
+    
+    const normalizedQuery = query.toLowerCase();
+    return [...new Set(
+      products
+        .filter(p => p.name.toLowerCase().includes(normalizedQuery))
+        .map(p => p.name)
+        .slice(0, 5)
+    )];
   },
 }));

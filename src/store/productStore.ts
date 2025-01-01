@@ -34,7 +34,7 @@ export const useStore = create<ProductStore>((set, get) => ({
   fetchProducts: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase.from("products").select("*");
+      const { data, error } = await supabase().from("products").select("*");
       if (error) throw error;
       set({ products: data, isLoading: false });
     } catch (error) {

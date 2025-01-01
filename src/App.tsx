@@ -76,7 +76,7 @@ function App() {
                 <Route
                   path="/"
                   element={
-                    <div className="flex items-center gap-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="flex items-center grid gap-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                       <ProductForm
                         onAdd={addProduct}
                         products={products}

@@ -45,7 +45,7 @@ export const useStore = create<ProductStore>((set, get) => ({
   fetchShoppingList: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase.from("shopping_list").select("*");
+      const { data, error } = await supabase().from("shopping_list").select("*");
       if (error) throw error;
       console.log("Fetched shopping list:", data);
       set({ shoppingList: data, isLoading: false });

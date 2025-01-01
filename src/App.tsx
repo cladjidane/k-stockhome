@@ -83,12 +83,13 @@ function App() {
                           updateProduct(id, { quantity })
                         }
                       />
-                      <input
-                        type="text"
+                      <AutocompleteInput
+                        suggestions={products.map(p => p.name)}
+                        selectedItems={searchQuery ? [searchQuery] : []}
+                        onItemsChange={(items) => setSearchQuery(items[0] || '')}
                         placeholder="Rechercher un produit..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="flex-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                        label=""
+                        name="search"
                       />
                     </div>
                   }

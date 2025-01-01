@@ -125,7 +125,7 @@ export default function ProductItem({
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                 {product.name}
               </h3>
@@ -193,7 +193,7 @@ export default function ProductItem({
 
       {isExpanded && product.nutriments && (
         <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <div className="grid grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-sm">
             <div className="text-center">
               <div className="font-medium text-gray-900 dark:text-white">
                 {product.nutriments.energy_100g}

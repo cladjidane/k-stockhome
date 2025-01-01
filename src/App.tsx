@@ -35,8 +35,8 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-          <div className="max-w-7xl mx-auto px-6 py-12">
-            <nav className="flex items-center justify-between mb-12">
+          <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-12">
+            <nav className="flex items-center justify-between mb-6 md:mb-12">
               <NavLink
                 to="/inventory"
                 className={({ isActive }) =>

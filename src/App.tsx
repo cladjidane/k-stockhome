@@ -7,6 +7,7 @@ import ProductForm from "./components/ProductForm";
 import ProductList from "./features/products/components/ProductList";
 import ShoppingList from "./features/shopping-list/components/ShoppingList";
 import { useStore } from "./store/productStore";
+import AutocompleteInput from "./components/AutocompleteInput";
 
 function App() {
   const { fetchProducts, fetchShoppingList } = useStore();
@@ -84,9 +85,11 @@ function App() {
                         }
                       />
                       <AutocompleteInput
-                        suggestions={products.map(p => p.name)}
+                        suggestions={products.map((p) => p.name)}
                         selectedItems={searchQuery ? [searchQuery] : []}
-                        onItemsChange={(items) => setSearchQuery(items[0] || '')}
+                        onItemsChange={(items) =>
+                          setSearchQuery(items[0] || "")
+                        }
                         placeholder="Rechercher un produit..."
                         label=""
                         name="search"

@@ -67,6 +67,11 @@ function App() {
                   }
                 >
                   <ShoppingCart className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                  {shoppingList.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {shoppingList.length}
+                    </span>
+                  )}
                 </NavLink>
                 <ThemeToggle />
               </div>

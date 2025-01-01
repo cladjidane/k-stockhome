@@ -61,7 +61,14 @@ export default function ProductItem({
       quantity: 1,
       unit: product.unit,
     });
-    // L'alerte reste visible tant que le stock est bas
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500';
+    toast.textContent = 'Produit ajouté au panier';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 2000);
   };
 
   const renderNutriscore = () => {
@@ -103,22 +110,15 @@ export default function ProductItem({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-visible transition-all duration-200 hover:shadow-md">
       {showLowStockAlert && (
-        <div className="px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-800/30">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-              <span className="text-sm text-amber-700 dark:text-amber-300">
-                Stock bas pour {product.name}
-              </span>
-            </div>
+        <div className="absolute top-2 right-16">
+          <Tooltip content="Stock bas - Ajouter au panier">
             <button
               onClick={handleAddToShoppingList}
-              className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-amber-100 dark:bg-amber-800/30 hover:bg-amber-200 dark:hover:bg-amber-800/50 text-amber-700 dark:text-amber-300 rounded-md transition-colors"
+              className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors"
             >
-              <ShoppingCart className="w-4 h-4" />
-              <span>Ajouter au panier</span>
+              <AlertTriangle className="w-4 h-4" />
             </button>
-          </div>
+          </Tooltip>
         </div>
       )}
 

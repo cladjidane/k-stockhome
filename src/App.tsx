@@ -88,10 +88,8 @@ function App() {
                       <div className="space-y-4">
                         <AutocompleteInput
                           suggestions={products.map((p) => p.name)}
-                          selectedItems={searchQuery ? [searchQuery] : []}
-                          onItemsChange={(items) =>
-                            setSearchQuery(items[0] || "")
-                          }
+                          selectedItem={searchQuery}
+                          onItemChange={setSearchQuery}
                           placeholder="Rechercher un produit..."
                           label=""
                           name="search"

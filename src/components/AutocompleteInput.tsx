@@ -3,8 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 
 interface AutocompleteInputProps {
   suggestions: string[];
-  selectedItems: string[];
-  onItemsChange: (items: string[]) => void;
+  selectedItem: string;
+  onItemChange: (item: string) => void;
   placeholder?: string;
   label: string;
   helpText?: string;
@@ -30,12 +30,15 @@ export default function AutocompleteInput({
   useEffect(() => {
     const filtered = suggestions
       .filter(suggestion => 
-        suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
-        !selectedItems.includes(suggestion)
+        suggestion.toLowerCase().includes(inputValue.toLowerCase())
       )
-      .slice(0, 5); // Limiter à 5 suggestions
+      .slice(0, 5);
     setFilteredSuggestions(filtered);
-  }, [inputValue, suggestions, selectedItems]);
+  }, [inputValue, suggestions]);
+
+  useEffect(() => {
+    setInputValue(selectedItem || '');
+  }, [selectedItem]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,21 +58,16 @@ export default function AutocompleteInput({
     const value = e.target.value;
     setInputValue(value);
     setShowSuggestions(true);
+    if (!value) {
+      onItemChange('');
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && inputValue.trim()) {
       e.preventDefault();
-      if (!selectedItems.includes(inputValue.trim())) {
-        onItemsChange([...selectedItems, inputValue.trim()]);
-      }
-      setInputValue('');
+      onItemChange(inputValue.trim());
       setShowSuggestions(false);
-    } else if (e.key === 'Backspace' && !inputValue) {
-      e.preventDefault();
-      const newItems = [...selectedItems];
-      newItems.pop();
-      onItemsChange(newItems);
     } else if (e.key === 'Escape') {
       setShowSuggestions(false);
       inputRef.current?.blur();

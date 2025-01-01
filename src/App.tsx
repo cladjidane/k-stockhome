@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { Package, ShoppingCart, Menu } from "lucide-react";
@@ -49,9 +48,11 @@ function App() {
 
               <div className="flex items-center space-x-3">
                 <Package className="w-8 h-8 text-blue-600 dark:text-white" />
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Le Placard à Ju
-                </h1>
+                <NavLink to="/">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    Le Placard à Ju
+                  </h1>
+                </NavLink>
               </div>
 
               <div className="flex items-center space-x-4">
@@ -71,8 +72,8 @@ function App() {
 
             <div className="max-w-2xl mx-auto">
               <Routes>
-                <Route 
-                  path="/" 
+                <Route
+                  path="/"
                   element={
                     <div className="flex items-center gap-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                       <ProductForm
@@ -90,10 +91,10 @@ function App() {
                         className="flex-1 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                       />
                     </div>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/inventory" 
+                <Route
+                  path="/inventory"
                   element={
                     <div className="p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                       <ProductList
@@ -108,10 +109,10 @@ function App() {
                         onAddToShoppingList={addToShoppingList}
                       />
                     </div>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/shopping-list" 
+                <Route
+                  path="/shopping-list"
                   element={
                     <div className="p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
                       <ShoppingList
@@ -125,7 +126,7 @@ function App() {
                         onPurchaseComplete={removeFromShoppingList}
                       />
                     </div>
-                  } 
+                  }
                 />
               </Routes>
             </div>

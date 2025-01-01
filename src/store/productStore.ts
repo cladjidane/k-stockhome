@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -15,15 +16,11 @@ interface ProductStore {
   removeProduct: (id: string) => Promise<void>;
   setSelectedCategory: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
-  addToShoppingList: (
-    item: Omit<ShoppingListItem, "id" | "addedAt">,
-  ) => Promise<void>;
+  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => Promise<void>;
   removeFromShoppingList: (id: string) => Promise<void>;
-  updateShoppingItem: (
-    id: string,
-    updates: Partial<ShoppingListItem>,
-  ) => Promise<void>;
+  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => Promise<void>;
   getFilteredProducts: () => Product[];
+  fetchShoppingList: () => Promise<void>;
 }
 
 export const useStore = create<ProductStore>((set, get) => ({
@@ -50,48 +47,47 @@ export const useStore = create<ProductStore>((set, get) => ({
     try {
       const { data, error } = await supabase.from("shopping_list").select("*");
       if (error) throw error;
+      console.log("Fetched shopping list:", data);
       set({ shoppingList: data, isLoading: false });
     } catch (error) {
+      console.error("Error fetching shopping list:", error);
       set({ error: (error as Error).message, isLoading: false });
     }
   },
 
   addToShoppingList: async (item) => {
-    console.log("Adding item to shopping list:", item);
     try {
-      console.log(item);
+      const { data: existing } = await supabase
+        .from("shopping_list")
+        .select()
+        .eq('product_id', item.product_id)
+        .single();
+
+      if (existing) {
+        console.log('Item already in shopping list');
+        return;
+      }
+
       const { data, error } = await supabase
         .from("shopping_list")
-        .insert([
-          {
-            product_id: item.id,
-            name: item.name,
-            quantity: item.quantity || 1,
-            unit: item.unit,
-            auto_update_stock: true,
-          },
-        ])
+        .insert([{
+          product_id: item.product_id,
+          name: item.name,
+          quantity: item.quantity || 1,
+          unit: item.unit,
+          auto_update_stock: true,
+        }])
         .select()
         .single();
 
-      if (error) {
-        console.error("Error adding to shopping list:", error);
-        throw error;
-      }
-
-      console.log("Successfully added to shopping list:", data);
-      set((state) => ({
-        shoppingList: [...state.shoppingList, data],
-      }));
+      if (error) throw error;
+      await get().fetchShoppingList();
     } catch (error) {
-      console.log(error);
-      console.error("Caught error:", error);
       set({ error: (error as Error).message });
     }
   },
 
   addProduct: async (product) => {
-    console.log("Attempting to add product:", product);
     try {
       const { data, error } = await supabase
         .from("products")
@@ -99,15 +95,9 @@ export const useStore = create<ProductStore>((set, get) => ({
         .select()
         .single();
 
-      if (error) {
-        console.error("Error adding product:", error);
-        throw error;
-      }
-
-      console.log("Product added successfully:", data);
+      if (error) throw error;
       set((state) => ({ products: [...state.products, data] }));
     } catch (error) {
-      console.error("Caught error while adding product:", error);
       set({ error: (error as Error).message });
     }
   },
@@ -121,7 +111,7 @@ export const useStore = create<ProductStore>((set, get) => ({
       if (error) throw error;
       set((state) => ({
         products: state.products.map((p) =>
-          p.id === id ? { ...p, ...updates } : p,
+          p.id === id ? { ...p, ...updates } : p
         ),
       }));
     } catch (error) {
@@ -138,64 +128,6 @@ export const useStore = create<ProductStore>((set, get) => ({
       }));
     } catch (error) {
       set({ error: (error as Error).message });
-    }
-  },
-
-  setSelectedCategory: (category) => set({ selectedCategory: category }),
-  setSearchQuery: (query) => set({ searchQuery: query }),
-
-  addToShoppingList: async (item) => {
-    console.log("Adding to shopping list:", item);
-    try {
-      // Vérifier si le produit existe déjà
-      const { data: existing } = await supabase
-        .from("shopping_list")
-        .select()
-        .eq('product_id', item.id)
-        .single();
-
-      if (existing) {
-        console.log('Item already in shopping list');
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from("shopping_list")
-        .insert([
-          {
-            product_id: item.id,
-            name: item.name,
-            quantity: 1,
-            unit: item.unit,
-            auto_update_stock: true,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error adding to shopping list:", error);
-        throw error;
-      }
-
-      console.log("Successfully added to shopping list:", data);
-      await get().fetchShoppingList(); // Rafraîchir la liste après l'ajout
-    } catch (error) {
-      console.error("Error in addToShoppingList:", error);
-      set({ error: (error as Error).message });
-    }
-  },
-
-  fetchShoppingList: async () => {
-    set({ isLoading: true });
-    try {
-      const { data, error } = await supabase.from("shopping_list").select("*");
-      if (error) throw error;
-      console.log("Fetched shopping list:", data);
-      set({ shoppingList: data, isLoading: false });
-    } catch (error) {
-      console.error("Error fetching shopping list:", error);
-      set({ error: (error as Error).message, isLoading: false });
     }
   },
 
@@ -223,13 +155,16 @@ export const useStore = create<ProductStore>((set, get) => ({
       if (error) throw error;
       set((state) => ({
         shoppingList: state.shoppingList.map((i) =>
-          i.id === id ? { ...i, ...updates } : i,
+          i.id === id ? { ...i, ...updates } : i
         ),
       }));
     } catch (error) {
       set({ error: (error as Error).message });
     }
   },
+
+  setSelectedCategory: (category) => set({ selectedCategory: category }),
+  setSearchQuery: (query) => set({ searchQuery: query }),
 
   getFilteredProducts: () => {
     const { products, selectedCategory, searchQuery } = get();

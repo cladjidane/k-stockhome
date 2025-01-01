@@ -116,7 +116,11 @@ export default function AutocompleteInput({
       <div className="mt-1">
         <div
           className="flex flex-wrap gap-2 p-2 border rounded-md border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
-          onClick={() => inputRef.current?.focus()}
+          onClick={() => {
+            inputRef.current?.focus();
+            setInputValue("");
+            onItemChange("");
+          }}
         >
           <input
             ref={inputRef}

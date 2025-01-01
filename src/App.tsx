@@ -84,16 +84,37 @@ function App() {
                           updateProduct(id, { quantity })
                         }
                       />
-                      <AutocompleteInput
-                        suggestions={products.map((p) => p.name)}
-                        selectedItems={searchQuery ? [searchQuery] : []}
-                        onItemsChange={(items) =>
-                          setSearchQuery(items[0] || "")
-                        }
-                        placeholder="Rechercher un produit..."
-                        label=""
-                        name="search"
-                      />
+                      <div className="space-y-4">
+                        <AutocompleteInput
+                          suggestions={products.map((p) => p.name)}
+                          selectedItems={searchQuery ? [searchQuery] : []}
+                          onItemsChange={(items) =>
+                            setSearchQuery(items[0] || "")
+                          }
+                          placeholder="Rechercher un produit..."
+                          label=""
+                          name="search"
+                        />
+                        {searchQuery && (
+                          <div className="mt-4">
+                            {products
+                              .filter((p) => p.name === searchQuery)
+                              .map((product) => (
+                                <ProductItem
+                                  key={product.id}
+                                  product={product}
+                                  onDelete={removeProduct}
+                                  onUpdateQuantity={(id, quantity) =>
+                                    updateProduct(id, { quantity })
+                                  }
+                                  onUpdateLocation={(id, location) =>
+                                    updateProduct(id, { location })
+                                  }
+                                />
+                              ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   }
                 />

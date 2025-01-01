@@ -1,16 +1,13 @@
-
 import {
   ChevronDown,
   ChevronUp,
   Trash2,
   Award,
-  Leaf,
   AlertTriangle,
-  ShoppingCart,
 } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Tooltip } from "../../../shared";
-import { Product, ShoppingListItem } from "../../../types";
+import { Product } from "../../../types";
 import { useStore } from "../../../store/productStore";
 
 interface ProductItemProps {
@@ -39,15 +36,11 @@ const defaultLocationStyle = {
   icon: "📍",
 };
 
-export default function ProductItem({
-  product,
-  onDelete,
-  onUpdateQuantity,
-  onUpdateLocation
-}: ProductItemProps) {
+export default function ProductItem({ product, onDelete }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
-  const locationStyle = locationColors[product.location] || defaultLocationStyle;
+  const locationStyle =
+    locationColors[product.location] || defaultLocationStyle;
   const { addToShoppingList } = useStore();
 
   useEffect(() => {
@@ -61,12 +54,13 @@ export default function ProductItem({
       quantity: 1,
       unit: product.unit,
     });
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500';
-    toast.textContent = 'Produit ajouté au panier';
+    const toast = document.createElement("div");
+    toast.className =
+      "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500";
+    toast.textContent = "Produit ajouté au panier";
     document.body.appendChild(toast);
     setTimeout(() => {
-      toast.style.opacity = '0';
+      toast.style.opacity = "0";
       setTimeout(() => toast.remove(), 500);
     }, 2000);
   };
@@ -109,36 +103,23 @@ export default function ProductItem({
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-visible transition-all duration-200 hover:shadow-md">
-      {showLowStockAlert && (
-        <div className="absolute top-4 right-20">
-          <Tooltip content="Stock bas - Ajouter au panier">
-            <button
-              onClick={handleAddToShoppingList}
-              className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors shadow-sm"
-            >
-              <AlertTriangle className="w-4 h-4" />
-            </button>
-          </Tooltip>
-        </div>
-      )}
-
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">
-                {product.name}
-              </h3>
-              <div className="flex items-center gap-2">
-                {product.nutriments && (
-                  <Tooltip content="Informations nutritionnelles disponibles">
-                    <div className="relative">
-                      <Leaf className="w-4 h-4 text-green-500" />
-                    </div>
+              <h3 className="flex items-center text-lg font-medium text-gray-900 dark:text-white truncate">
+                {showLowStockAlert && (
+                  <Tooltip content="Stock bas - Ajouter au panier">
+                    <button
+                      onClick={handleAddToShoppingList}
+                      className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors shadow-sm"
+                    >
+                      <AlertTriangle className="w-4 h-4" />
+                    </button>
                   </Tooltip>
                 )}
-                {renderNutriscore()}
-              </div>
+                {product.name}
+              </h3>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
               <div
@@ -153,7 +134,7 @@ export default function ProductItem({
             </div>
           </div>
 
-          <div className="flex items-start gap-2">
+          <div className="flex items-start">
             <Tooltip content="Supprimer le produit">
               <div className="relative">
                 <button
@@ -193,6 +174,9 @@ export default function ProductItem({
 
       {isExpanded && product.nutriments && (
         <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-2 justify-center bg-neutral-100 p-1 rounded ">
+            {renderNutriscore()}
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-sm">
             <div className="text-center">
               <div className="font-medium text-gray-900 dark:text-white">

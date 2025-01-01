@@ -8,6 +8,7 @@ import ProductList from "./features/products/components/ProductList";
 import ShoppingList from "./features/shopping-list/components/ShoppingList";
 import { useStore } from "./store/productStore";
 import AutocompleteInput from "./components/AutocompleteInput";
+import ProductItem from "./features/products/components/ProductItem";
 
 function App() {
   const { fetchProducts, fetchShoppingList } = useStore();

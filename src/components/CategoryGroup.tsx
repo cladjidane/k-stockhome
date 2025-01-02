@@ -45,7 +45,7 @@ export default function CategoryGroup({
       initial="hidden"
       animate="show"
       variants={container}
-      className="bg-white rounded-lg shadow mb-4 overflow-hidden"
+      className="bg-white/80 backdrop-blur-sm rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 mb-4 overflow-hidden hover:shadow-md transition-all duration-200"
     >
       {/* En-tête de la catégorie */}
       <button

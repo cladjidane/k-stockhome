@@ -30,35 +30,35 @@ function App() {
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
           <div className="max-w-lg mx-auto px-4 pb-safe-bottom">
             {/* Header */}
-            <header className="pt-safe-top mb-8 bg-primary-500 text-white p-4 rounded-lg">
-              {" "}
-              {/* Added background color and padding */}
-              <h1 className="text-3xl font-display font-bold mb-2">
-                {" "}
-                {/*Slightly reduced text size */}
-                Le Placard à Ju
-              </h1>
-              <p className="text-lg">
-                {" "}
-                {/*Increased text size for better readability*/}
-                Gérez votre inventaire facilement
-              </p>
-            </header>
-
-            {/* Search Bar */}
-            <div className="relative mb-8">
-              <AutocompleteInput
-                suggestions={products.map((p) => p.name)}
-                selectedItem={searchQuery}
-                onItemChange={setSearchQuery}
-                placeholder="Rechercher un produit..."
-                name="search"
-                label=""
-              />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Search className="w-5 h-5 text-gray-400" />
+            <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white p-8 rounded-xl shadow-lg relative mb-16">
+              <div className="max-w-2xl mx-auto">
+                <h1 className="text-4xl font-display font-bold mb-3 tracking-tight">
+                  Le Placard à Ju
+                </h1>
+                <p className="text-lg text-primary-50 font-light">
+                  Gérez votre inventaire facilement
+                </p>
               </div>
-            </div>
+              
+              {/* Search Bar */}
+              <div className="absolute -bottom-6 left-4 right-4">
+                <div className="max-w-2xl mx-auto">
+                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2">
+              <AutocompleteInput
+                      suggestions={products.map((p) => p.name)}
+                      selectedItem={searchQuery}
+                      onItemChange={setSearchQuery}
+                      placeholder="Rechercher un produit..."
+                      name="search"
+                      label=""
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <Search className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </header>
 
             {/* Categories */}
             <div className="mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg">

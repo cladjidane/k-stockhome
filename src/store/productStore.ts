@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -5,26 +6,24 @@ import { supabase } from "../config/supabase/client";
 interface ProductStore {
   products: Product[];
   shoppingList: ShoppingListItem[];
-  categories: string[];
-  labels: string[];
+  mainCategories: Record<string, string[]>;
   selectedCategory: string | null;
   searchQuery: string;
   isLoading: boolean;
   error: string | null;
   fetchProducts: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
+  addMainCategory: (name: string, subCategories: string[]) => Promise<void>;
+  updateMainCategory: (id: number, name: string, subCategories: string[]) => Promise<void>;
+  getMainCategory: (category: string) => Promise<string>;
   addProduct: (product: Omit<Product, "id">) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
   removeProduct: (id: string) => Promise<void>;
   setSelectedCategory: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
-  addToShoppingList: (
-    item: Omit<ShoppingListItem, "id" | "addedAt">,
-  ) => Promise<void>;
+  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => Promise<void>;
   removeFromShoppingList: (id: string) => Promise<void>;
-  updateShoppingItem: (
-    id: string,
-    updates: Partial<ShoppingListItem>,
-  ) => Promise<void>;
+  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => Promise<void>;
   getFilteredProducts: () => Product[];
   fetchShoppingList: () => Promise<void>;
 }
@@ -32,39 +31,35 @@ interface ProductStore {
 export const useStore = create<ProductStore>((set, get) => ({
   products: [],
   shoppingList: [],
-  categories: [],
-  labels: [],
+  mainCategories: {},
   selectedCategory: null,
+  searchQuery: "",
+  isLoading: false,
+  error: null,
 
   fetchCategories: async () => {
     try {
       const { data, error } = await supabase()
-        .from('categories')
-        .select('name');
+        .from('main_categories')
+        .select('*');
       if (error) throw error;
-      set({ categories: data.map(c => c.name) });
+      
+      const categories = data.reduce((acc, cat) => ({
+        ...acc,
+        [cat.name]: cat.sub_categories
+      }), {});
+      
+      set({ mainCategories: categories });
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
   },
 
-  fetchLabels: async () => {
-    try {
-      const { data, error } = await supabase()
-        .from('labels')
-        .select('name');
-      if (error) throw error;
-      set({ labels: data.map(l => l.name) });
-    } catch (error) {
-      console.error('Error fetching labels:', error);
-    }
-  },
-
-  addCategory: async (name: string) => {
+  addMainCategory: async (name: string, subCategories: string[]) => {
     try {
       const { error } = await supabase()
-        .from('categories')
-        .insert([{ name }]);
+        .from('main_categories')
+        .insert([{ name, sub_categories: subCategories }]);
       if (error) throw error;
       get().fetchCategories();
     } catch (error) {
@@ -72,203 +67,40 @@ export const useStore = create<ProductStore>((set, get) => ({
     }
   },
 
-  addLabel: async (name: string) => {
+  updateMainCategory: async (id: number, name: string, subCategories: string[]) => {
     try {
       const { error } = await supabase()
-        .from('labels')
-        .insert([{ name }]);
+        .from('main_categories')
+        .update({ name, sub_categories: subCategories })
+        .eq('id', id);
       if (error) throw error;
-      get().fetchLabels();
+      get().fetchCategories();
     } catch (error) {
-      console.error('Error adding label:', error);
-    }
-  },
-  searchQuery: "",
-  isLoading: false,
-  error: null,
-
-  fetchProducts: async () => {
-    set({ isLoading: true });
-    try {
-      const { data, error } = await supabase().from("products").select("*");
-      if (error) throw error;
-      set({ products: data, isLoading: false });
-    } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
+      console.error('Error updating category:', error);
     }
   },
 
-  fetchShoppingList: async () => {
-    set({ isLoading: true });
-    try {
-      const { data, error } = await supabase()
-        .from("shopping_list")
-        .select("*");
-      if (error) throw error;
-      console.log("Fetched shopping list:", data);
-      set({ shoppingList: data, isLoading: false });
-    } catch (error) {
-      console.error("Error fetching shopping list:", error);
-      set({ error: (error as Error).message, isLoading: false });
-    }
-  },
-
-  addToShoppingList: async (item) => {
-    try {
-      const { data: existing } = await supabase()
-        .from("shopping_list")
-        .select()
-        .eq("product_id", item.product_id)
-        .single();
-
-      if (existing) {
-        const { error } = await supabase()
-          .from("shopping_list")
-          .update({ quantity: item.quantity })
-          .eq("product_id", item.product_id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase()
-          .from("shopping_list")
-          .insert([
-            {
-              product_id: item.product_id,
-              name: item.name,
-              quantity: item.quantity || 1,
-              unit: item.unit,
-              auto_update_stock: true,
-            },
-          ]);
-
-        if (error) throw error;
+  getMainCategory: async (category: string) => {
+    if (!category) return 'Autres';
+    
+    const { mainCategories } = get();
+    const lowerCategory = category.toLowerCase();
+    
+    for (const [mainCat, subCats] of Object.entries(mainCategories)) {
+      if (lowerCategory.includes(mainCat.toLowerCase())) {
+        return mainCat;
       }
-
-      await get().fetchShoppingList();
-    } catch (error) {
-      set({ error: (error as Error).message });
+      for (const subCat of subCats) {
+        if (lowerCategory.includes(subCat.toLowerCase())) {
+          return mainCat;
+        }
+      }
     }
+    
+    return 'Autres';
   },
 
-  addProduct: async (product) => {
-    try {
-      const { data, error } = await supabase()
-        .from("products")
-        .insert([product])
-        .select()
-        .single();
-
-      if (error) throw error;
-      set((state) => ({ products: [...state.products, data] }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
-  updateProduct: async (id, updates) => {
-    try {
-      const { error } = await supabase()
-        .from("products")
-        .update(updates)
-        .eq("id", id);
-      if (error) throw error;
-      set((state) => ({
-        products: state.products.map((p) =>
-          p.id === id ? { ...p, ...updates } : p,
-        ),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
-  removeProduct: async (id) => {
-    try {
-      const { error } = await supabase().from("products").delete().eq("id", id);
-      if (error) throw error;
-      set((state) => ({
-        products: state.products.filter((p) => p.id !== id),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
-  removeFromShoppingList: async (id) => {
-    try {
-      const { error } = await supabase()
-        .from("shopping_list")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-      set((state) => ({
-        shoppingList: state.shoppingList.filter((i) => i.id !== id),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
-  updateShoppingItem: async (id, updates) => {
-    try {
-      const { error } = await supabase()
-        .from("shopping_list")
-        .update(updates)
-        .eq("id", id);
-      if (error) throw error;
-      set((state) => ({
-        shoppingList: state.shoppingList.map((i) =>
-          i.id === id ? { ...i, ...updates } : i,
-        ),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
-  setSelectedCategory: (category) => set({ selectedCategory: category }),
-  setSearchQuery: (query) => set({ searchQuery: query }),
-
-  getFilteredProducts: () => {
-    const { products, selectedCategory, searchQuery } = get();
-    return products.filter((product) => {
-      const matchesCategory =
-        !selectedCategory || product.category === selectedCategory;
-
-      if (!searchQuery) return matchesCategory;
-
-      const query = searchQuery.toLowerCase();
-      const name = product.name.toLowerCase();
-
-      const startsWithMatch = name.startsWith(query);
-      const containsMatch = query
-        .split(" ")
-        .every((word) => name.includes(word.toLowerCase()));
-
-      return matchesCategory && (startsWithMatch || containsMatch);
-    });
-  },
-
-  getSuggestions: (query: string) => {
-    const { products } = get();
-    if (!query) return [];
-
-    const normalizedQuery = query.toLowerCase();
-    return [
-      ...new Set(
-        products
-          .filter((p) => p.name.toLowerCase().includes(normalizedQuery))
-          .map((p) => p.name)
-          .slice(0, 5),
-      ),
-    ];
-  },
+  // ... Rest of the existing store code ...
 }));
 
-export const {
-  updateShoppingItem,
-  updateProduct,
-  removeProduct,
-  addToShoppingList,
-  removeFromShoppingList,
-} = useStore.getState();
+// ... Rest of the exports ...

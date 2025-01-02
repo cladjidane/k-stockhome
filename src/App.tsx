@@ -11,6 +11,8 @@ import {
   updateProduct,
   removeProduct,
   addToShoppingList,
+  removeFromShoppingList,
+  updateShoppingItem,
 } from "./store/productStore";
 
 function App() {

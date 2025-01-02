@@ -3,6 +3,7 @@ import { Product } from '../types';
 import AutocompleteInput from './AutocompleteInput';
 import FormField from './FormField';
 import { commonCategories, commonLabels } from '../data/suggestions';
+import { availableLocations } from '../utils/productUtils';
 
 interface ManualProductFormProps {
   onSubmit: (product: Omit<Product, 'id'>) => void;

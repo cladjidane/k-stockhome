@@ -36,7 +36,7 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
       />
       
       {displayProduct && searchQuery && (
-        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div className="absolute left-0 right-0 top-full mt-2 z-50 dark:bg-gray-800 rounded-lg">
           {filteredProducts.map((product) => (
               <ProductItem
                 key={product.id}

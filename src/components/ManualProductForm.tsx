@@ -83,20 +83,45 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
         </FormField>
       </div>
 
-      <FormField
-        label="Emplacement"
-        name="location"
-        type="select"
-        value={formData.location}
-        onChange={handleChange}
-        required
-      >
-        <option value="Placard cuisine">Placard cuisine</option>
-        <option value="Réfrigérateur">Réfrigérateur</option>
-        <option value="Congélateur">Congélateur</option>
-        <option value="Garde-manger">Garde-manger</option>
-        <option value="Boîte à pain">Boîte à pain</option>
-      </FormField>
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Emplacements
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {availableLocations.map((location) => (
+            <button
+              key={location}
+              type="button"
+              onClick={() => {
+                const locations = Array.isArray(formData.location)
+                  ? formData.location
+                  : [formData.location];
+                
+                if (locations.includes(location)) {
+                  setFormData(prev => ({
+                    ...prev,
+                    location: locations.filter(loc => loc !== location)
+                  }));
+                } else {
+                  setFormData(prev => ({
+                    ...prev,
+                    location: [...locations, location]
+                  }));
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-sm ${
+                (Array.isArray(formData.location) 
+                  ? formData.location.includes(location)
+                  : formData.location === location)
+                  ? 'bg-blue-100 text-blue-800 border-blue-300'
+                  : 'bg-gray-100 text-gray-800 border-gray-300'
+              } border`}
+            >
+              {location}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <AutocompleteInput
         name="categories"

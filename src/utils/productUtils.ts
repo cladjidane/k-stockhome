@@ -1,20 +1,30 @@
-export const locationMapping: { [key: string]: string } = {
-    divers: "Dépendance",
-    frais: "Réfrigérateur",
-    laitier: "Réfrigérateur",
-    yaourt: "Réfrigérateur",
-    fromage: "Réfrigérateur",
-    surgelé: "Congélateur",
-    glace: "Congélateur",
-    conserve: "Placard cuisine",
-    épicerie: "Placard cuisine",
-    fruit: "Réfrigérateur",
-    légume: "Réfrigérateur",
-    boulangerie: "Tiroir cuisine",
-    pâtisserie: "Tiroir cuisine",
-    boisson: "Placard cuisine",
-    jus: "Réfrigérateur",
-    bio: "Placard cuisine",
+export const availableLocations = [
+  "Placard cuisine",
+  "Réfrigérateur",
+  "Congélateur",
+  "Garde-manger",
+  "Boîte à pain",
+  "Tiroir cuisine",
+  "Dépendance"
+];
+
+export const locationMapping: { [key: string]: string[] } = {
+    divers: ["Dépendance"],
+    frais: ["Réfrigérateur"],
+    laitier: ["Réfrigérateur"],
+    yaourt: ["Réfrigérateur"],
+    fromage: ["Réfrigérateur"],
+    surgelé: ["Congélateur"],
+    glace: ["Congélateur"],
+    conserve: ["Placard cuisine", "Garde-manger"],
+    épicerie: ["Placard cuisine", "Garde-manger"],
+    fruit: ["Réfrigérateur"],
+    légume: ["Réfrigérateur"],
+    boulangerie: ["Tiroir cuisine", "Boîte à pain"],
+    pâtisserie: ["Tiroir cuisine"],
+    boisson: ["Placard cuisine"],
+    jus: ["Réfrigérateur"],
+    bio: ["Placard cuisine"],
 };
 
 export const dietMapping: { [key: string]: string } = {

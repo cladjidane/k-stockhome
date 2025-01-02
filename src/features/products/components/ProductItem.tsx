@@ -28,6 +28,8 @@ const locationColors: Record<
   Congélateur: { bg: "bg-indigo-50", text: "text-indigo-700", icon: "🧊" },
   "Garde-manger": { bg: "bg-green-50", text: "text-green-700", icon: "🏠" },
   "Boîte à pain": { bg: "bg-orange-50", text: "text-orange-700", icon: "🍞" },
+  "Tiroir cuisine": { bg: "bg-purple-50", text: "text-purple-700", icon: "🗄️" },
+  "Dépendance": { bg: "bg-gray-50", text: "text-gray-700", icon: "🏪" },
 };
 
 const defaultLocationStyle = {
@@ -122,11 +124,28 @@ export default function ProductItem({ product, onDelete }: ProductItemProps) {
               </h3>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <div
-                className={`inline-flex items-center px-2 py-1 rounded-md ${locationStyle.bg} ${locationStyle.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
-              >
-                <span className="mr-1">{locationStyle.icon}</span>
-                {product.location}
+              <div className="flex flex-wrap gap-2">
+                {Array.isArray(product.location) ? (
+                  product.location.map((loc) => {
+                    const style = locationColors[loc] || defaultLocationStyle;
+                    return (
+                      <div
+                        key={loc}
+                        className={`inline-flex items-center px-2 py-1 rounded-md ${style.bg} ${style.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
+                      >
+                        <span className="mr-1">{style.icon}</span>
+                        {loc}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div
+                    className={`inline-flex items-center px-2 py-1 rounded-md ${locationStyle.bg} ${locationStyle.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
+                  >
+                    <span className="mr-1">{locationStyle.icon}</span>
+                    {product.location}
+                  </div>
+                )}
               </div>
               <div className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
                 {product.quantity} {product.unit}

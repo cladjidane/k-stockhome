@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { Tooltip } from "../../../shared";
 import { Product } from "../../../types";
 import { useStore } from "../../../store/productStore";
+import { availableLocations } from "../../../utils/productUtils";
 
 interface ProductItemProps {
   product: Product;

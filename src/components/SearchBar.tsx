@@ -17,6 +17,43 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
     return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   };
 
+  const filteredProducts = searchQuery
+    ? products.filter((p) =>
+        normalizeString(p.name).includes(normalizeString(searchQuery))
+      )
+    : [];
+
+  return (
+    <div className="w-full">
+      <AutocompleteInput
+        suggestions={products.map((p) => p.name)}
+        selectedItem={searchQuery}
+        onItemChange={setSearchQuery}
+        placeholder="Rechercher un produit..."
+        name="search"
+        label=""
+      />
+      
+      {displayProduct && searchQuery && (
+        <div className="mt-4">
+          {filteredProducts.map((product) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                onDelete={removeProduct}
+                onUpdateQuantity={(id, quantity) =>
+                  updateProduct(id, { quantity })
+                }
+                onUpdateLocation={(id, location) =>
+                  updateProduct(id, { location })
+                }
+              />
+            ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="w-full">
       <AutocompleteInput

@@ -184,22 +184,16 @@ export default function ProductItem({
                           <button
                             key={location}
                             onClick={() => {
-                              const locations = Array.isArray(product.location)
+                              const currentLocations = Array.isArray(product.location)
                                 ? product.location
                                 : [product.location];
+                              
+                              const updatedLocations = currentLocations.includes(location)
+                                ? currentLocations.filter(loc => loc !== location)
+                                : [...new Set([...currentLocations, location])];
 
-                              if (locations.includes(location)) {
-                                onUpdateLocation(
-                                  product.id,
-                                  locations
-                                    .filter((loc) => loc !== location)
-                                    .join(","),
-                                );
-                              } else {
-                                onUpdateLocation(
-                                  product.id,
-                                  [...locations, location].join(","),
-                                );
+                              if (updatedLocations.length > 0) {
+                                onUpdateLocation(product.id, updatedLocations.join(","));
                               }
                             }}
                             className={`w-full text-left px-4 py-2 text-sm ${

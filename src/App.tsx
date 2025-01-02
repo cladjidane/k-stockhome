@@ -66,6 +66,25 @@ function App() {
                     label=""
                   />
                 </div>
+                {searchQuery && (
+                  <div className="mt-4">
+                    {products
+                      .filter((p) => p.name === searchQuery)
+                      .map((product) => (
+                        <ProductItem
+                          key={product.id}
+                          product={product}
+                          onDelete={removeProduct}
+                          onUpdateQuantity={(id, quantity) =>
+                            updateProduct(id, { quantity })
+                          }
+                          onUpdateLocation={(id, location) =>
+                            updateProduct(id, { location })
+                          }
+                        />
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </header>

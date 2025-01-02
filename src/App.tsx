@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import { Package, ShoppingCart, Menu, Search, Home, User } from "lucide-react";
+import { Package, ShoppingCart, Menu, Search, Home, User, Camera } from "lucide-react";
 import { ThemeProvider } from "./shared/contexts/ThemeContext";
 import ProductForm from "./components/ProductForm";
 import ProductList from "./features/products/components/ProductList";
@@ -66,45 +66,13 @@ function App() {
               <Route
                 path="/"
                 element={
-                  <div className="mb-8 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        Emplacements
-                      </h2>
-                      <NavLink
-                        to="/products"
-                        className="text-primary-600 text-sm font-medium"
-                      >
-                        Voir tout
-                      </NavLink>
-                    </div>
-                    <div className="grid grid-cols-4 gap-4">
-                      {[
-                        "Réfrigérateur",
-                        "Congélateur",
-                        "Placard",
-                        "Tiroir",
-                      ].map((location) => (
-                        <button
-                          key={location}
-                          className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <span className="text-2xl mb-2">
-                            {location === "Réfrigérateur"
-                              ? "❄️"
-                              : location === "Congélateur"
-                                ? "🧊"
-                                : location === "Placard"
-                                  ? "🏠"
-                                  : "🗄️"}
-                          </span>
-                          <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
-                            {location}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <div className="flex justify-center items-center my-8">
+                  <ProductForm 
+                    onAdd={(product) => addProduct(product)}
+                    products={products}
+                    onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
+                  />
+                </div>
                 }
               />
               <Route

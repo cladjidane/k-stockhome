@@ -1,31 +1,17 @@
-import React, { useState, useMemo } from "react";
-import CategoryFilters from "./CategoryFilters";
-import { motion, AnimatePresence } from "framer-motion";
-import { Product, ShoppingListItem } from "../../../types";
-import { groupProductsByCategory } from "../../../utils/categoryUtils";
-import AnimatedTransition from "../../../shared/components/AnimatedTransition";
+
+import { useState } from "react";
+import { Product } from "../../../types";
 import CategoryGroup from "../../../components/CategoryGroup";
-import { availableLocations } from "../../../utils/productUtils";
-import SearchBar from "../../../components/SearchBar";
 import { useStore } from "../../../store/productStore";
+import CategoryFilters from "./CategoryFilters";
 
 interface ProductListProps {
   products: Product[];
   onUpdateQuantity: (id: string, quantity: number) => void;
   onUpdateLocation: (id: string, location: string) => void;
   onDelete: (id: string) => void;
-  onAddToShoppingList: (item: ShoppingListItem) => void;
+  onAddToShoppingList: (product: Product) => void;
 }
-
-const container = {
-  hidden: { opacity: 1 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
 
 export default function ProductList({
   products,
@@ -34,136 +20,45 @@ export default function ProductList({
   onDelete,
   onAddToShoppingList,
 }: ProductListProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const { mainCategories, getMainCategory } = useStore();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const allCategories = useMemo(() => {
-    const categories = new Set<string>();
-    products.forEach((product) => {
-      if (product.categories) {
-        product.categories.split(",").forEach((cat) => {
-          categories.add(cat.trim());
-        });
-      }
-    });
-    return Array.from(categories).sort();
-  }, [products]);
+  // Grouper les produits par catégorie
+  const groupedProducts: Record<string, Product[]> = {};
+  products.forEach((product) => {
+    const category = getMainCategory(product.category || '') || 'Autres';
+    if (!groupedProducts[category]) {
+      groupedProducts[category] = [];
+    }
+    groupedProducts[category].push(product);
+  });
 
-  const { searchQuery } = useStore();
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategories =
-        selectedCategories.length === 0 ||
-        (product.categories &&
-          selectedCategories.some((cat) =>
-            product.categories
-              .split(",")
-              .map((c) => c.trim())
-              .includes(cat),
-          ));
-
-      const locations = Array.isArray(product.location)
-        ? product.location
-        : product.location.split(",").map((l) => l.trim());
-
-      const matchesLocations =
-        selectedLocations.length === 0 ||
-        selectedLocations.some((loc) => locations.includes(loc));
-
-      const matchesSearch = !searchQuery || 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return matchesCategories && matchesLocations && matchesSearch;
-    });
-  }, [products, selectedCategories, selectedLocations, searchQuery]);
-
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories((prev) => {
-      if (prev.includes(category)) {
-        return prev.filter((cat) => cat !== category);
-      }
-      return [...prev, category];
-    });
-  };
-
-  const handleLocationToggle = (location: string) => {
-    setSelectedLocations((prev) => {
-      if (prev.includes(location)) {
-        return prev.filter((loc) => loc !== location);
-      }
-      return [...prev, location];
-    });
-  };
-
-  const groupedProducts = groupProductsByCategory(filteredProducts);
+  // Filtrer les produits si une catégorie est sélectionnée
+  const filteredGroups = selectedCategory
+    ? { [selectedCategory]: groupedProducts[selectedCategory] || [] }
+    : groupedProducts;
 
   return (
-    <AnimatedTransition animation="fade">
-      <div className="space-y-4 py-16">
-        <div className="mb-4">
-          <SearchBar displayProduct={false} />
-        </div>
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            {availableLocations.map((location) => (
-              <button
-                key={location}
-                onClick={() => handleLocationToggle(location)}
-                className={`px-3 py-1 rounded-full text-sm border transition-colors
-                  ${
-                    selectedLocations.includes(location)
-                      ? "bg-blue-100 text-blue-800 border-blue-300"
-                      : "bg-gray-100 text-gray-800 border-gray-300"
-                  }`}
-              >
-                {location}
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="py-16">
+      <CategoryFilters
+        categories={Object.keys(mainCategories)}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="space-y-4"
-        >
-          <AnimatePresence mode="popLayout">
-            {Object.entries(groupedProducts).map(
-              ([category, categoryProducts]) => (
-                <motion.div
-                  key={category}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <CategoryGroup
-                    title={category}
-                    products={categoryProducts}
-                    onUpdateQuantity={onUpdateQuantity}
-                    onUpdateLocation={onUpdateLocation}
-                    onDelete={onDelete}
-                    onAddToShoppingList={onAddToShoppingList}
-                  />
-                </motion.div>
-              ),
-            )}
-          </AnimatePresence>
-
-          {Object.keys(groupedProducts).length === 0 && (
-            <AnimatedTransition animation="scale">
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                {products.length === 0
-                  ? "Aucun produit dans votre stock"
-                  : "Aucun produit ne correspond aux filtres sélectionnés"}
-              </div>
-            </AnimatedTransition>
-          )}
-        </motion.div>
+      <div className="space-y-4">
+        {Object.entries(filteredGroups).map(([category, categoryProducts]) => (
+          <CategoryGroup
+            key={category}
+            title={category}
+            products={categoryProducts}
+            onUpdateQuantity={onUpdateQuantity}
+            onUpdateLocation={onUpdateLocation}
+            onDelete={onDelete}
+            onAddToShoppingList={onAddToShoppingList}
+          />
+        ))}
       </div>
-    </AnimatedTransition>
+    </div>
   );
 }

@@ -154,20 +154,15 @@ export default function ProductItem({
                     const style = locationColors[loc] || defaultLocationStyle;
                     return (
                       <div
+                        onClick={() => setShowLocations(!showLocations)}
                         key={loc}
-                        className={`inline-flex items-center px-2 py-1 rounded-md ${style.bg} ${style.text} text-sm`}
+                        className={`cursor-pointer inline-flex items-center px-2 py-1 rounded-md ${style.bg} ${style.text} text-sm`}
                       >
                         <span className="mr-1">{style.icon}</span>
                         {loc}
                       </div>
                     );
                   })}
-                  <button
-                    onClick={() => setShowLocations(!showLocations)}
-                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
-                  >
-                    <Pen className="w-4 h-4" />
-                  </button>
                 </div>
 
                 {showLocations && (
@@ -184,15 +179,29 @@ export default function ProductItem({
                           <button
                             key={location}
                             onClick={() => {
-                              const currentLocation = product.location || '';
-                              const locationArray = currentLocation.split(',').map(l => l.trim()).filter(Boolean);
-                              
+                              const currentLocation = product.location || "";
+                              const locationArray = currentLocation
+                                .split(",")
+                                .map((l) => l.trim())
+                                .filter(Boolean);
+
                               if (locationArray.includes(location)) {
-                                const newLocations = locationArray.filter(l => l !== location);
-                                onUpdateLocation(product.id, newLocations.join(','));
+                                const newLocations = locationArray.filter(
+                                  (l) => l !== location,
+                                );
+                                onUpdateLocation(
+                                  product.id,
+                                  newLocations.join(","),
+                                );
                               } else {
-                                const newLocations = [...locationArray, location];
-                                onUpdateLocation(product.id, newLocations.join(','));
+                                const newLocations = [
+                                  ...locationArray,
+                                  location,
+                                ];
+                                onUpdateLocation(
+                                  product.id,
+                                  newLocations.join(","),
+                                );
                               }
                               setShowLocations(false);
                             }}

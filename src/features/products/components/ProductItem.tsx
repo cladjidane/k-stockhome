@@ -39,7 +39,7 @@ const defaultLocationStyle = {
   icon: "📍",
 };
 
-export default function ProductItem({ product, onDelete }: ProductItemProps) {
+export default function ProductItem({ product, onDelete, onUpdateLocation }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationStyle =

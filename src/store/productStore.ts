@@ -214,3 +214,18 @@ export const useStore = create<ProductStore>((set, get) => ({
     });
   },
 }));
+
+export const {
+  addProduct,
+  updateProduct,
+  removeProduct,
+  addToShoppingList,
+  removeFromShoppingList,
+  updateShoppingItem,
+  fetchProducts,
+  fetchShoppingList,
+  fetchCategories,
+  addMainCategory,
+  updateMainCategory,
+  getMainCategory
+} = useStore.getState();

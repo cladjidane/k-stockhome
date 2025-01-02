@@ -113,7 +113,7 @@ export default function AutocompleteInput({
       </label>
       <div className="mt-1">
         <div
-          className="flex flex-wrap gap-2 p-2 border rounded-md border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
           onClick={() => {
             inputRef.current?.focus();
             setInputValue("");

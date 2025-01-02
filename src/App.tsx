@@ -9,7 +9,14 @@ import { useStore } from "./store/productStore";
 import AutocompleteInput from "./components/AutocompleteInput";
 
 function App() {
-  const { fetchProducts, fetchShoppingList, products, shoppingList, searchQuery, setSearchQuery } = useStore();
+  const {
+    fetchProducts,
+    fetchShoppingList,
+    products,
+    shoppingList,
+    searchQuery,
+    setSearchQuery,
+  } = useStore();
 
   useEffect(() => {
     fetchProducts();
@@ -22,11 +29,17 @@ function App() {
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
           <div className="max-w-lg mx-auto px-4 pb-safe-bottom">
             {/* Header */}
-            <header className="pt-safe-top mb-8 bg-primary-500 text-white p-4 rounded-lg"> {/* Added background color and padding */}
-              <h1 className="text-3xl font-display font-bold mb-2"> {/*Slightly reduced text size */}
+            <header className="pt-safe-top mb-8 bg-primary-500 text-white p-4 rounded-lg">
+              {" "}
+              {/* Added background color and padding */}
+              <h1 className="text-3xl font-display font-bold mb-2">
+                {" "}
+                {/*Slightly reduced text size */}
                 Le Placard à Ju
               </h1>
-              <p className="text-lg"> {/*Increased text size for better readability*/}
+              <p className="text-lg">
+                {" "}
+                {/*Increased text size for better readability*/}
                 Gérez votre inventaire facilement
               </p>
             </header>
@@ -34,13 +47,12 @@ function App() {
             {/* Search Bar */}
             <div className="relative mb-8">
               <AutocompleteInput
-                suggestions={products.map(p => p.name)}
+                suggestions={products.map((p) => p.name)}
                 selectedItem={searchQuery}
                 onItemChange={setSearchQuery}
                 placeholder="Rechercher un produit..."
                 name="search"
                 label=""
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600" {/* Added styling for input */}
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Search className="w-5 h-5 text-gray-400" />
@@ -48,7 +60,9 @@ function App() {
             </div>
 
             {/* Categories */}
-            <div className="mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/*Added background color and padding for better visibility */}
+            <div className="mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg">
+              {" "}
+              {/*Added background color and padding for better visibility */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Emplacements
@@ -58,36 +72,51 @@ function App() {
                 </button>
               </div>
               <div className="grid grid-cols-4 gap-4">
-                {['Réfrigérateur', 'Congélateur', 'Placard', 'Tiroir'].map((location) => (
-                  <button
-                    key={location}
-                    className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700" {/* Added hover effect */}
-                  >
-                    <span className="text-2xl mb-2">
-                      {location === 'Réfrigérateur' ? '❄️' :
-                        location === 'Congélateur' ? '🧊' :
-                        location === 'Placard' ? '🏠' : '🗄️'}
-                    </span>
-                    <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
-                      {location}
-                    </span>
-                  </button>
-                ))}
+                {["Réfrigérateur", "Congélateur", "Placard", "Tiroir"].map(
+                  (location) => (
+                    <button
+                      key={location}
+                      className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <span className="text-2xl mb-2">
+                        {location === "Réfrigérateur"
+                          ? "❄️"
+                          : location === "Congélateur"
+                            ? "🧊"
+                            : location === "Placard"
+                              ? "🏠"
+                              : "🗄️"}
+                      </span>
+                      <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                        {location}
+                      </span>
+                    </button>
+                  ),
+                )}
               </div>
             </div>
 
             {/* Main Content */}
-            <main className="mb-20 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/*Added background color and padding for better visibility */}
+            <main className="mb-20 bg-white dark:bg-gray-800 p-4 rounded-lg">
+              {" "}
+              {/*Added background color and padding for better visibility */}
               <Routes>
-                <Route path="/" element={
-                  <ProductList 
-                    products={products}
-                    onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
-                    onUpdateLocation={(id, location) => updateProduct(id, { location })}
-                    onDelete={removeProduct}
-                    onAddToShoppingList={addToShoppingList}
-                  />
-                } />
+                <Route
+                  path="/"
+                  element={
+                    <ProductList
+                      products={products}
+                      onUpdateQuantity={(id, quantity) =>
+                        updateProduct(id, { quantity })
+                      }
+                      onUpdateLocation={(id, location) =>
+                        updateProduct(id, { location })
+                      }
+                      onDelete={removeProduct}
+                      onAddToShoppingList={addToShoppingList}
+                    />
+                  }
+                />
                 <Route path="/shopping-list" element={<ShoppingList />} />
               </Routes>
             </main>
@@ -99,11 +128,17 @@ function App() {
                   <Home className="w-6 h-6" />
                   <span className="text-xs mt-1">Accueil</span>
                 </NavLink>
-                <NavLink to="/search" className="p-2 flex flex-col items-center">
+                <NavLink
+                  to="/search"
+                  className="p-2 flex flex-col items-center"
+                >
                   <Search className="w-6 h-6" />
                   <span className="text-xs mt-1">Rechercher</span>
                 </NavLink>
-                <NavLink to="/shopping-list" className="p-2 flex flex-col items-center">
+                <NavLink
+                  to="/shopping-list"
+                  className="p-2 flex flex-col items-center"
+                >
                   <ShoppingCart className="w-6 h-6" />
                   <span className="text-xs mt-1">Liste</span>
                 </NavLink>

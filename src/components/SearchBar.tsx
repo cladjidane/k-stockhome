@@ -24,7 +24,7 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
     : [];
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <AutocompleteInput
         suggestions={products.map((p) => p.name)}
         selectedItem={searchQuery}
@@ -36,7 +36,7 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
       />
       
       {displayProduct && searchQuery && (
-        <div className="mt-4">
+        <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
           {filteredProducts.map((product) => (
               <ProductItem
                 key={product.id}

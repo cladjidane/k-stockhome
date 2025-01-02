@@ -105,23 +105,19 @@ function App() {
                   <span className="text-xs mt-1">Accueil</span>
                 </NavLink>
                 <NavLink
-                  to="/search"
+                  to="/products"
                   className="p-2 flex flex-col items-center"
                 >
                   <Search className="w-6 h-6" />
                   <span className="text-xs mt-1">Rechercher</span>
                 </NavLink>
                 <NavLink
-                  to="/shopping-list"
+                  to="/cart"
                   className="p-2 flex flex-col items-center"
                 >
                   <ShoppingCart className="w-6 h-6" />
                   <span className="text-xs mt-1">Liste</span>
                 </NavLink>
-                <button className="p-2 flex flex-col items-center">
-                  <User className="w-6 h-6" />
-                  <span className="text-xs mt-1">Profil</span>
-                </button>
               </div>
             </nav>
           </div>

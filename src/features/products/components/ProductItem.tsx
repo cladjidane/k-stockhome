@@ -50,7 +50,7 @@ export default function ProductItem({
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationMenuRef = useRef<HTMLDivElement>(null);
-  const { addToShoppingList, shoppingList } = useStore();
+  const { addToShoppingList, shoppingList, onUpdateQuantity } = useStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -70,9 +70,11 @@ export default function ProductItem({
   }, [product.quantity]);
 
   const handleAddToShoppingList = () => {
-    const shoppingListItem = shoppingList.find(item => item.product_id === product.id);
+    const shoppingListItem = shoppingList.find(
+      (item) => item.product_id === product.id,
+    );
     const currentQuantity = shoppingListItem?.quantity || 0;
-    
+
     addToShoppingList({
       product_id: product.id,
       name: product.name,
@@ -233,7 +235,12 @@ export default function ProductItem({
             <div className="flex items-center space-x-2">
               <div className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
                 <button
-                  onClick={() => onUpdateQuantity(product.id, Math.max(0, product.quantity - 1))}
+                  onClick={() =>
+                    onUpdateQuantity(
+                      product.id,
+                      Math.max(0, product.quantity - 1),
+                    )
+                  }
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"
                   aria-label="Diminuer la quantité"
                 >
@@ -243,7 +250,9 @@ export default function ProductItem({
                   {product.quantity} {product.unit}
                 </span>
                 <button
-                  onClick={() => onUpdateQuantity(product.id, product.quantity + 1)}
+                  onClick={() =>
+                    onUpdateQuantity(product.id, product.quantity + 1)
+                  }
                   className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full"
                   aria-label="Augmenter la quantité"
                 >

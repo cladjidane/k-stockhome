@@ -3,9 +3,10 @@ import {
   ChevronUp,
   Trash2,
   Award,
+  PenLine,
   AlertTriangle,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Tooltip } from "../../../shared";
 import { Product } from "../../../types";
 import { useStore } from "../../../store/productStore";
@@ -30,7 +31,7 @@ const locationColors: Record<
   "Garde-manger": { bg: "bg-green-50", text: "text-green-700", icon: "🏠" },
   "Boîte à pain": { bg: "bg-orange-50", text: "text-orange-700", icon: "🍞" },
   "Tiroir cuisine": { bg: "bg-purple-50", text: "text-purple-700", icon: "🗄️" },
-  "Dépendance": { bg: "bg-gray-50", text: "text-gray-700", icon: "🏪" },
+  Dépendance: { bg: "bg-gray-50", text: "text-gray-700", icon: "🏪" },
 };
 
 const defaultLocationStyle = {
@@ -39,7 +40,11 @@ const defaultLocationStyle = {
   icon: "📍",
 };
 
-export default function ProductItem({ product, onDelete, onUpdateLocation }: ProductItemProps) {
+export default function ProductItem({
+  product,
+  onDelete,
+  onUpdateLocation,
+}: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
@@ -47,12 +52,15 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (locationMenuRef.current && !locationMenuRef.current.contains(event.target as Node)) {
+      if (
+        locationMenuRef.current &&
+        !locationMenuRef.current.contains(event.target as Node)
+      ) {
         setShowLocations(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   const locationStyle =
     locationColors[product.location] || defaultLocationStyle;
@@ -139,7 +147,10 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
             <div className="mt-1 space-y-2">
               <div className="relative group" ref={locationMenuRef}>
                 <div className="flex flex-wrap gap-2">
-                  {(Array.isArray(product.location) ? product.location : [product.location]).map((loc) => {
+                  {(Array.isArray(product.location)
+                    ? product.location
+                    : [product.location]
+                  ).map((loc) => {
                     const style = locationColors[loc] || defaultLocationStyle;
                     return (
                       <div
@@ -158,16 +169,17 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
                     <PenLine className="w-4 h-4" />
                   </button>
                 </div>
-                
+
                 {showLocations && (
                   <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                     <div className="py-1">
                       {availableLocations.map((location) => {
-                        const style = locationColors[location] || defaultLocationStyle;
-                        const isSelected = Array.isArray(product.location) 
+                        const style =
+                          locationColors[location] || defaultLocationStyle;
+                        const isSelected = Array.isArray(product.location)
                           ? product.location.includes(location)
                           : product.location === location;
-                        
+
                         return (
                           <button
                             key={location}
@@ -175,28 +187,30 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
                               const locations = Array.isArray(product.location)
                                 ? product.location
                                 : [product.location];
-                              
+
                               if (locations.includes(location)) {
-                                onUpdateLocation(product.id, 
-                                  locations.filter(loc => loc !== location).join(',')
+                                onUpdateLocation(
+                                  product.id,
+                                  locations
+                                    .filter((loc) => loc !== location)
+                                    .join(","),
                                 );
                               } else {
-                                onUpdateLocation(product.id, 
-                                  [...locations, location].join(',')
+                                onUpdateLocation(
+                                  product.id,
+                                  [...locations, location].join(","),
                                 );
                               }
                             }}
                             className={`w-full text-left px-4 py-2 text-sm ${
-                              isSelected 
+                              isSelected
                                 ? `${style.bg} ${style.text}`
-                                : 'text-gray-700 hover:bg-gray-100'
+                                : "text-gray-700 hover:bg-gray-100"
                             }`}
                           >
                             <span className="mr-2">{style.icon}</span>
                             {location}
-                            {isSelected && (
-                              <span className="ml-2">✓</span>
-                            )}
+                            {isSelected && <span className="ml-2">✓</span>}
                           </button>
                         );
                       })}

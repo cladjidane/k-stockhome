@@ -69,10 +69,7 @@ function App() {
                   <ShoppingCart className="w-6 h-6 text-gray-600 dark:text-gray-400" />
                   {shoppingList.length > 0 && (
                     <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
-                      {shoppingList.reduce(
-                        (acc, item) => acc + item.quantity,
-                        0,
-                      )}
+                      {shoppingList.length}
                     </span>
                   )}
                 </NavLink>

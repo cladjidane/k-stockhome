@@ -80,7 +80,7 @@ export default function ProductItem({
 
     const toast = document.createElement("div");
     toast.className =
-      "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500 flex items-center gap-2";
+      "fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500 flex items-center gap-2 z-50";
     toast.innerHTML = `
       <span>✓</span>
       <div>

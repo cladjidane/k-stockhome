@@ -93,7 +93,7 @@ export default function ProductItem({
       <span>✓</span>
       <div>
         <div class="font-medium">${product.name}</div>
-        <div class="text-sm opacity-90">Ajouté au panier (${currentQuantity + 1} ${product.unit})</div>
+        <div class="text-sm opacity-90">Ajouté au panier (${shoppingListItem ? shoppingListItem.quantity + 1 : 1} ${product.unit})</div>
       </div>
     `;
     document.body.appendChild(toast);

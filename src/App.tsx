@@ -1,164 +1,110 @@
+
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import { Package, ShoppingCart, Menu } from "lucide-react";
+import { Package, ShoppingCart, Menu, Search, Home, User } from "lucide-react";
 import { ThemeProvider } from "./shared/contexts/ThemeContext";
-import ThemeToggle from "./shared/components/ThemeToggle";
 import ProductForm from "./components/ProductForm";
 import ProductList from "./features/products/components/ProductList";
 import ShoppingList from "./features/shopping-list/components/ShoppingList";
 import { useStore } from "./store/productStore";
 import AutocompleteInput from "./components/AutocompleteInput";
-import ProductItem from "./features/products/components/ProductItem";
 
 function App() {
-  const { fetchProducts, fetchShoppingList } = useStore();
+  const { fetchProducts, fetchShoppingList, products, shoppingList, searchQuery, setSearchQuery } = useStore();
 
   useEffect(() => {
     fetchProducts();
     fetchShoppingList();
   }, []);
 
-  const {
-    products,
-    shoppingList,
-    searchQuery,
-    setSearchQuery,
-    addProduct,
-    updateProduct,
-    removeProduct,
-    removeFromShoppingList,
-    updateShoppingItem,
-    addToShoppingList,
-  } = useStore();
-
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-          <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-12">
-            <nav className="flex items-center justify-between mb-6 md:mb-12">
-              <NavLink
-                to="/inventory"
-                className={({ isActive }) =>
-                  `p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg ${
-                    isActive ? "bg-gray-100 dark:bg-gray-800" : ""
-                  }`
-                }
-              >
-                <Menu className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              </NavLink>
+        <div className="min-h-screen bg-background-light dark:bg-background-dark">
+          <div className="max-w-lg mx-auto px-4 pb-safe-bottom">
+            {/* Header */}
+            <header className="pt-safe-top mb-8">
+              <h1 className="text-4xl font-display font-bold text-gray-900 dark:text-white mb-2">
+                Le Placard à Ju
+              </h1>
+              <p className="text-gray-600 dark:text-gray-300">
+                Gérez votre inventaire facilement
+              </p>
+            </header>
 
-              <div className="flex items-center space-x-3">
-                <Package className="w-8 h-8 text-blue-600 dark:text-white" />
-                <NavLink to="/">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Le Placard à Ju
-                  </h1>
-                </NavLink>
+            {/* Search Bar */}
+            <div className="relative mb-8">
+              <AutocompleteInput
+                suggestions={products.map(p => p.name)}
+                selectedItem={searchQuery}
+                onItemChange={setSearchQuery}
+                placeholder="Rechercher un produit..."
+                name="search"
+                label=""
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                <Search className="w-5 h-5 text-gray-400" />
               </div>
+            </div>
 
-              <div className="flex items-center space-x-4">
-                <NavLink
-                  to="/shopping-list"
-                  className={({ isActive }) =>
-                    `p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg relative ${
-                      isActive ? "bg-gray-100 dark:bg-gray-800" : ""
-                    }`
-                  }
-                >
-                  <ShoppingCart className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                  {shoppingList.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center">
-                      {shoppingList.length}
+            {/* Categories */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Emplacements
+                </h2>
+                <button className="text-primary-600 text-sm font-medium">
+                  Voir tout
+                </button>
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                {['Réfrigérateur', 'Congélateur', 'Placard', 'Tiroir'].map((location) => (
+                  <button
+                    key={location}
+                    className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm"
+                  >
+                    <span className="text-2xl mb-2">
+                      {location === 'Réfrigérateur' ? '❄️' : 
+                       location === 'Congélateur' ? '🧊' :
+                       location === 'Placard' ? '🏠' : '🗄️'}
                     </span>
-                  )}
+                    <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                      {location}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <main className="mb-20">
+              <Routes>
+                <Route path="/" element={<ProductList products={products} />} />
+                <Route path="/shopping-list" element={<ShoppingList />} />
+              </Routes>
+            </main>
+
+            {/* Bottom Navigation */}
+            <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 pb-safe-bottom">
+              <div className="max-w-lg mx-auto px-4 py-2 flex items-center justify-around">
+                <NavLink to="/" className="p-2 flex flex-col items-center">
+                  <Home className="w-6 h-6" />
+                  <span className="text-xs mt-1">Accueil</span>
                 </NavLink>
-                <ThemeToggle />
+                <NavLink to="/search" className="p-2 flex flex-col items-center">
+                  <Search className="w-6 h-6" />
+                  <span className="text-xs mt-1">Rechercher</span>
+                </NavLink>
+                <NavLink to="/shopping-list" className="p-2 flex flex-col items-center">
+                  <ShoppingCart className="w-6 h-6" />
+                  <span className="text-xs mt-1">Liste</span>
+                </NavLink>
+                <button className="p-2 flex flex-col items-center">
+                  <User className="w-6 h-6" />
+                  <span className="text-xs mt-1">Profil</span>
+                </button>
               </div>
             </nav>
-
-            <div className="max-w-2xl mx-auto">
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <div className="flex items-center grid gap-6 p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                      <ProductForm
-                        onAdd={addProduct}
-                        products={products}
-                        onUpdateQuantity={(id, quantity) =>
-                          updateProduct(id, { quantity })
-                        }
-                      />
-                      <div className="space-y-4">
-                        <AutocompleteInput
-                          suggestions={products.map((p) => p.name)}
-                          selectedItem={searchQuery}
-                          onItemChange={setSearchQuery}
-                          placeholder="Rechercher un produit..."
-                          label=""
-                          name="search"
-                        />
-                        {searchQuery && (
-                          <div className="mt-4 relative">
-                            {products
-                              .filter((p) => p.name === searchQuery)
-                              .map((product) => (
-                                <ProductItem
-                                  key={product.id}
-                                  product={product}
-                                  onDelete={removeProduct}
-                                  onUpdateQuantity={(id, quantity) =>
-                                    updateProduct(id, { quantity })
-                                  }
-                                  onUpdateLocation={(id, location) =>
-                                    updateProduct(id, { location })
-                                  }
-                                />
-                              ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  }
-                />
-                <Route
-                  path="/inventory"
-                  element={
-                    <div className="p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                      <ProductList
-                        products={products}
-                        onUpdateQuantity={(id, quantity) =>
-                          updateProduct(id, { quantity })
-                        }
-                        onUpdateLocation={(id, location) =>
-                          updateProduct(id, { location })
-                        }
-                        onDelete={removeProduct}
-                        onAddToShoppingList={addToShoppingList}
-                      />
-                    </div>
-                  }
-                />
-                <Route
-                  path="/shopping-list"
-                  element={
-                    <div className="p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg">
-                      <ShoppingList
-                        items={shoppingList}
-                        products={products}
-                        onUpdateQuantity={(id, quantity) =>
-                          updateShoppingItem(id, { quantity })
-                        }
-                        onRemoveItem={removeFromShoppingList}
-                        onUpdateProduct={updateProduct}
-                        onPurchaseComplete={removeFromShoppingList}
-                      />
-                    </div>
-                  }
-                />
-              </Routes>
-            </div>
           </div>
         </div>
       </BrowserRouter>

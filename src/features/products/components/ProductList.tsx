@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import CategoryFilters from './CategoryFilters';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -5,6 +6,7 @@ import { Product, ShoppingListItem } from '../../../types';
 import { groupProductsByCategory } from '../../../utils/categoryUtils';
 import AnimatedTransition from '../../../shared/components/AnimatedTransition';
 import CategoryGroup from '../../../components/CategoryGroup';
+import { availableLocations } from '../../../utils/productUtils';
 
 interface ProductListProps {
   products: Product[];
@@ -32,8 +34,8 @@ export default function ProductList({
   onAddToShoppingList 
 }: ProductListProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
-  // Extraire toutes les catégories uniques
   const allCategories = useMemo(() => {
     const categories = new Set<string>();
     products.forEach(product => {
@@ -46,23 +48,41 @@ export default function ProductList({
     return Array.from(categories).sort();
   }, [products]);
 
-  // Filtrer les produits selon les catégories sélectionnées
   const filteredProducts = useMemo(() => {
-    if (selectedCategories.length === 0) return products;
-    
     return products.filter(product => {
-      if (!product.categories) return false;
-      const productCategories = product.categories.split(',').map(cat => cat.trim());
-      return selectedCategories.some(cat => productCategories.includes(cat));
+      const matchesCategories = selectedCategories.length === 0 || (
+        product.categories && selectedCategories.some(cat => 
+          product.categories.split(',').map(c => c.trim()).includes(cat)
+        )
+      );
+
+      const locations = Array.isArray(product.location) 
+        ? product.location 
+        : product.location.split(',').map(l => l.trim());
+
+      const matchesLocations = selectedLocations.length === 0 || (
+        selectedLocations.some(loc => locations.includes(loc))
+      );
+
+      return matchesCategories && matchesLocations;
     });
-  }, [products, selectedCategories]);
+  }, [products, selectedCategories, selectedLocations]);
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
         return prev.filter(cat => cat !== category);
       }
-      return [...new Set([...prev, category])];
+      return [...prev, category];
+    });
+  };
+
+  const handleLocationToggle = (location: string) => {
+    setSelectedLocations(prev => {
+      if (prev.includes(location)) {
+        return prev.filter(loc => loc !== location);
+      }
+      return [...prev, location];
     });
   };
 
@@ -71,11 +91,29 @@ export default function ProductList({
   return (
     <AnimatedTransition animation="fade">
       <div className="space-y-4">
-        <CategoryFilters
-          categories={allCategories}
-          selectedCategories={selectedCategories}
-          onCategoryToggle={handleCategoryToggle}
-        />
+        <div className="space-y-4">
+          <CategoryFilters
+            categories={allCategories}
+            selectedCategories={selectedCategories}
+            onCategoryToggle={handleCategoryToggle}
+          />
+          
+          <div className="flex flex-wrap gap-2">
+            {availableLocations.map((location) => (
+              <button
+                key={location}
+                onClick={() => handleLocationToggle(location)}
+                className={`px-3 py-1 rounded-full text-sm border transition-colors
+                  ${selectedLocations.includes(location)
+                    ? 'bg-blue-100 text-blue-800 border-blue-300'
+                    : 'bg-gray-100 text-gray-800 border-gray-300'
+                  }`}
+              >
+                {location}
+              </button>
+            ))}
+          </div>
+        </div>
         
         <motion.div
           variants={container}

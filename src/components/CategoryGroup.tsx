@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Product } from "../types";
 import ProductItem from "../features/products/components/ProductItem";
 
-interface CategoryGroupProps {
+interface LocationGroupProps {
   title: string;
   products: Product[];
   onUpdateQuantity: (id: string, quantity: number) => void;
@@ -29,14 +29,14 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export default function CategoryGroup({
+export default function LocationGroup({
   title,
   products,
   onUpdateQuantity,
   onUpdateLocation,
   onDelete,
   onAddToShoppingList,
-}: CategoryGroupProps) {
+}: LocationGroupProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
   if (products.length === 0) return null;

@@ -19,7 +19,6 @@ export default function ProductList({
   onDelete,
   onAddToShoppingList,
 }: ProductListProps) {
-  const { mainCategories } = useStore();
   const [searchTerm, setSearchTerm] = useState("");
   const [groupedProducts, setGroupedProducts] = useState<Record<string, Product[]>>({});
 
@@ -37,36 +36,25 @@ export default function ProductList({
         )
       : sortedProducts;
 
-    // Grouper les produits par catégorie
+    // Grouper les produits par emplacement
     const groups: Record<string, Product[]> = {};
     filteredProducts.forEach((product) => {
-      // Normalisation de la catégorie
-      const productCategories = (product.category || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      let assigned = false;
-
-      // Recherche de correspondance dans les catégories principales
-      for (const [mainCat, subCats] of Object.entries(mainCategories)) {
-        const normalizedMainCat = mainCat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const normalizedSubCats = subCats.map(cat => 
-          cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        );
-
-        if (productCategories.includes(normalizedMainCat) || 
-            normalizedSubCats.some(subCat => productCategories.includes(subCat))) {
-          if (!groups[mainCat]) {
-            groups[mainCat] = [];
-          }
-          groups[mainCat].push(product);
-          assigned = true;
-          break;
+      const locations = typeof product.location === 'string' 
+        ? product.location.split(',').map(loc => loc.trim())
+        : Array.isArray(product.location) ? product.location : [];
+        
+      locations.forEach(location => {
+        if (!groups[location]) {
+          groups[location] = [];
         }
-      }
+        groups[location].push(product);
+      });
 
-      if (!assigned) {
-        if (!groups['Autres']) {
-          groups['Autres'] = [];
+      if (locations.length === 0) {
+        if (!groups['Sans emplacement']) {
+          groups['Sans emplacement'] = [];
         }
-        groups['Autres'].push(product);
+        groups['Sans emplacement'].push(product);
       }
     });
 

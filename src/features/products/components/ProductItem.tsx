@@ -43,6 +43,17 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
+  const locationMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (locationMenuRef.current && !locationMenuRef.current.contains(event.target as Node)) {
+        setShowLocations(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const locationStyle =
     locationColors[product.location] || defaultLocationStyle;
   const { addToShoppingList } = useStore();
@@ -126,7 +137,7 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
               </h3>
             </div>
             <div className="mt-1 space-y-2">
-              <div className="relative group">
+              <div className="relative group" ref={locationMenuRef}>
                 <div className="flex flex-wrap gap-2">
                   {(Array.isArray(product.location) ? product.location : [product.location]).map((loc) => {
                     const style = locationColors[loc] || defaultLocationStyle;
@@ -142,10 +153,9 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
                   })}
                   <button
                     onClick={() => setShowLocations(!showLocations)}
-                    className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm"
+                    className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
                   >
-                    <span className="mr-1">📍</span>
-                    Modifier
+                    <PenLine className="w-4 h-4" />
                   </button>
                 </div>
                 

@@ -5,6 +5,8 @@ import { supabase } from "../config/supabase/client";
 interface ProductStore {
   products: Product[];
   shoppingList: ShoppingListItem[];
+  categories: string[];
+  labels: string[];
   selectedCategory: string | null;
   searchQuery: string;
   isLoading: boolean;
@@ -30,7 +32,57 @@ interface ProductStore {
 export const useStore = create<ProductStore>((set, get) => ({
   products: [],
   shoppingList: [],
+  categories: [],
+  labels: [],
   selectedCategory: null,
+
+  fetchCategories: async () => {
+    try {
+      const { data, error } = await supabase()
+        .from('categories')
+        .select('name');
+      if (error) throw error;
+      set({ categories: data.map(c => c.name) });
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  },
+
+  fetchLabels: async () => {
+    try {
+      const { data, error } = await supabase()
+        .from('labels')
+        .select('name');
+      if (error) throw error;
+      set({ labels: data.map(l => l.name) });
+    } catch (error) {
+      console.error('Error fetching labels:', error);
+    }
+  },
+
+  addCategory: async (name: string) => {
+    try {
+      const { error } = await supabase()
+        .from('categories')
+        .insert([{ name }]);
+      if (error) throw error;
+      get().fetchCategories();
+    } catch (error) {
+      console.error('Error adding category:', error);
+    }
+  },
+
+  addLabel: async (name: string) => {
+    try {
+      const { error } = await supabase()
+        .from('labels')
+        .insert([{ name }]);
+      if (error) throw error;
+      get().fetchLabels();
+    } catch (error) {
+      console.error('Error adding label:', error);
+    }
+  },
   searchQuery: "",
   isLoading: false,
   error: null,

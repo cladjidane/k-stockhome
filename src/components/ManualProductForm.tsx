@@ -1,8 +1,9 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Product } from '../types';
 import AutocompleteInput from './AutocompleteInput';
 import FormField from './FormField';
-import { commonCategories, commonLabels } from '../data/suggestions';
+import { useStore } from '../store/productStore';
 import { availableLocations } from '../utils/productUtils';
 
 interface ManualProductFormProps {
@@ -11,6 +12,7 @@ interface ManualProductFormProps {
 }
 
 export default function ManualProductForm({ onSubmit, onCancel }: ManualProductFormProps) {
+  const { categories, labels, fetchCategories, fetchLabels, addCategory, addLabel } = useStore();
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -19,15 +21,20 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
     location: 'Placard cuisine',
   });
 
-  const [categories, setCategories] = useState<string[]>([]);
-  const [labels, setLabels] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchCategories();
+    fetchLabels();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       ...formData,
-      categories: categories.join(', '),
-      labels: labels.join(', '),
+      categories: selectedCategories.join(', '),
+      labels: selectedLabels.join(', '),
       nutriscore: undefined,
       nutriments: {
         energy_100g: 0,
@@ -44,6 +51,22 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleCategoryChange = async (items: string[]) => {
+    setSelectedCategories(items);
+    const newCategories = items.filter(cat => !categories.includes(cat));
+    for (const newCat of newCategories) {
+      await addCategory(newCat);
+    }
+  };
+
+  const handleLabelChange = async (items: string[]) => {
+    setSelectedLabels(items);
+    const newLabels = items.filter(label => !labels.includes(label));
+    for (const newLabel of newLabels) {
+      await addLabel(newLabel);
+    }
   };
 
   return (
@@ -127,9 +150,9 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
       <AutocompleteInput
         name="categories"
         label="Catégories"
-        suggestions={commonCategories}
-        selectedItems={categories}
-        onItemsChange={setCategories}
+        suggestions={categories}
+        selectedItems={selectedCategories}
+        onItemsChange={handleCategoryChange}
         placeholder="Ajouter une catégorie"
         helpText="Appuyez sur Entrée pour ajouter une nouvelle catégorie"
       />
@@ -137,9 +160,9 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
       <AutocompleteInput
         name="labels"
         label="Labels"
-        suggestions={commonLabels}
-        selectedItems={labels}
-        onItemsChange={setLabels}
+        suggestions={labels}
+        selectedItems={selectedLabels}
+        onItemsChange={handleLabelChange}
         placeholder="Ajouter un label"
         helpText="Appuyez sur Entrée pour ajouter un nouveau label"
       />

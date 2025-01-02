@@ -1,9 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Product } from '../types';
-import AutocompleteInput from './AutocompleteInput';
 import FormField from './FormField';
-import { useStore } from '../store/productStore';
 import { availableLocations } from '../utils/productUtils';
 
 interface ManualProductFormProps {
@@ -12,7 +10,6 @@ interface ManualProductFormProps {
 }
 
 export default function ManualProductForm({ onSubmit, onCancel }: ManualProductFormProps) {
-  const { mainCategories, fetchCategories } = useStore();
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -21,18 +18,12 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
     location: 'Placard cuisine',
   });
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
       ...formData,
       location: Array.isArray(formData.location) ? formData.location.join(', ') : formData.location,
-      categories: selectedCategories.join(', '),
+      categories: '',
       nutriscore: undefined,
       nutriments: {
         energy_100g: 0,
@@ -50,10 +41,6 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
       [name]: value
     }));
   };
-
-  const allCategories = Object.entries(mainCategories).reduce((acc, [main, sub]) => {
-    return [...acc, main, ...sub];
-  }, [] as string[]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -132,16 +119,6 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
           ))}
         </div>
       </div>
-
-      <AutocompleteInput
-        name="categories"
-        label="Catégories"
-        suggestions={allCategories}
-        selectedItems={selectedCategories}
-        onItemsChange={setSelectedCategories}
-        placeholder="Ajouter une catégorie"
-        helpText="Sélectionnez une catégorie"
-      />
 
       <div className="flex justify-end space-x-3 pt-4">
         <button

@@ -45,6 +45,7 @@ export default function ProductItem({
   product,
   onDelete,
   onUpdateLocation,
+  onUpdateQuantity,
 }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLocations, setShowLocations] = useState(false);

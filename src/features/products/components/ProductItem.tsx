@@ -41,6 +41,7 @@ const defaultLocationStyle = {
 
 export default function ProductItem({ product, onDelete, onUpdateLocation }: ProductItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationStyle =
     locationColors[product.location] || defaultLocationStyle;
@@ -125,42 +126,73 @@ export default function ProductItem({ product, onDelete, onUpdateLocation }: Pro
               </h3>
             </div>
             <div className="mt-1 space-y-2">
-              <div className="flex flex-wrap gap-2">
-                {availableLocations.map((location) => {
-                  const style = locationColors[location] || defaultLocationStyle;
-                  const isSelected = Array.isArray(product.location) 
-                    ? product.location.includes(location)
-                    : product.location === location;
-                  
-                  return (
-                    <button
-                      key={location}
-                      onClick={() => {
-                        const locations = Array.isArray(product.location)
-                          ? product.location
-                          : [product.location];
+              <div className="relative group">
+                <div className="flex flex-wrap gap-2">
+                  {(Array.isArray(product.location) ? product.location : [product.location]).map((loc) => {
+                    const style = locationColors[loc] || defaultLocationStyle;
+                    return (
+                      <div
+                        key={loc}
+                        className={`inline-flex items-center px-2 py-1 rounded-md ${style.bg} ${style.text} text-sm`}
+                      >
+                        <span className="mr-1">{style.icon}</span>
+                        {loc}
+                      </div>
+                    );
+                  })}
+                  <button
+                    onClick={() => setShowLocations(!showLocations)}
+                    className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm"
+                  >
+                    <span className="mr-1">📍</span>
+                    Modifier
+                  </button>
+                </div>
+                
+                {showLocations && (
+                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="py-1">
+                      {availableLocations.map((location) => {
+                        const style = locationColors[location] || defaultLocationStyle;
+                        const isSelected = Array.isArray(product.location) 
+                          ? product.location.includes(location)
+                          : product.location === location;
                         
-                        if (locations.includes(location)) {
-                          onUpdateLocation(product.id, 
-                            locations.filter(loc => loc !== location).join(',')
-                          );
-                        } else {
-                          onUpdateLocation(product.id, 
-                            [...locations, location].join(',')
-                          );
-                        }
-                      }}
-                      className={`inline-flex items-center px-2 py-1 rounded-md transition-colors ${
-                        isSelected 
-                          ? `${style.bg} ${style.text}`
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      } text-sm dark:bg-opacity-10 dark:text-opacity-90`}
-                    >
-                      <span className="mr-1">{style.icon}</span>
-                      {location}
-                    </button>
-                  );
-                })}
+                        return (
+                          <button
+                            key={location}
+                            onClick={() => {
+                              const locations = Array.isArray(product.location)
+                                ? product.location
+                                : [product.location];
+                              
+                              if (locations.includes(location)) {
+                                onUpdateLocation(product.id, 
+                                  locations.filter(loc => loc !== location).join(',')
+                                );
+                              } else {
+                                onUpdateLocation(product.id, 
+                                  [...locations, location].join(',')
+                                );
+                              }
+                            }}
+                            className={`w-full text-left px-4 py-2 text-sm ${
+                              isSelected 
+                                ? `${style.bg} ${style.text}`
+                                : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            <span className="mr-2">{style.icon}</span>
+                            {location}
+                            {isSelected && (
+                              <span className="ml-2">✓</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
                 {product.quantity} {product.unit}

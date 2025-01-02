@@ -34,6 +34,12 @@ export default function CategoryFilters({
     category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCategoryToggle = (category: string) => {
+    if (!selectedCategories.includes(category)) {
+      onCategoryToggle(category);
+    }
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -107,7 +113,7 @@ export default function CategoryFilters({
                     return (
                       <button
                         key={category}
-                        onClick={() => onCategoryToggle(category)}
+                        onClick={() => handleCategoryToggle(category)}
                         className={`
                           w-full text-left px-3 py-2 rounded-md text-sm transition-colors duration-200
                           ${

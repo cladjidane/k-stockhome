@@ -62,7 +62,7 @@ export default function ProductList({
       if (prev.includes(category)) {
         return prev.filter(cat => cat !== category);
       }
-      return [...prev, category];
+      return [...new Set([...prev, category])];
     });
   };
 

@@ -59,7 +59,7 @@ export default function ProductList({
     });
 
     setGroupedProducts(groups);
-  }, [products, mainCategories, searchTerm]);
+  }, [products, searchTerm]);
 
   return (
     <div className="py-16">

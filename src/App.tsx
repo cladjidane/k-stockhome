@@ -22,6 +22,7 @@ import {
   removeFromShoppingList,
   updateShoppingItem,
 } from "./store/productStore";
+import ProductItem from "./features/products/components/ProductItem";
 
 function App() {
   const {
@@ -66,29 +67,30 @@ function App() {
                     label=""
                   />
                 </div>
-                {searchQuery && (
-                  <div className="mt-4">
-                    {products
-                      .filter((p) => p.name === searchQuery)
-                      .map((product) => (
-                        <ProductItem
-                          key={product.id}
-                          product={product}
-                          onDelete={removeProduct}
-                          onUpdateQuantity={(id, quantity) =>
-                            updateProduct(id, { quantity })
-                          }
-                          onUpdateLocation={(id, location) =>
-                            updateProduct(id, { location })
-                          }
-                        />
-                      ))}
-                  </div>
-                )}
               </div>
             </div>
           </header>
           <div className="max-w-2xl mx-auto px-4 pb-safe-bottom">
+            {searchQuery && (
+              <div className="mt-4">
+                {products
+                  .filter((p) => p.name === searchQuery)
+                  .map((product) => (
+                    <ProductItem
+                      key={product.id}
+                      product={product}
+                      onDelete={removeProduct}
+                      onUpdateQuantity={(id, quantity) =>
+                        updateProduct(id, { quantity })
+                      }
+                      onUpdateLocation={(id, location) =>
+                        updateProduct(id, { location })
+                      }
+                    />
+                  ))}
+              </div>
+            )}
+
             <Routes>
               <Route
                 path="/"

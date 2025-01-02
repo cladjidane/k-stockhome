@@ -79,7 +79,15 @@ function App() {
             {/* Main Content */}
             <main className="mb-20 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/*Added background color and padding for better visibility */}
               <Routes>
-                <Route path="/" element={<ProductList products={products} />} />
+                <Route path="/" element={
+                  <ProductList 
+                    products={products}
+                    onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
+                    onUpdateLocation={(id, location) => updateProduct(id, { location })}
+                    onDelete={removeProduct}
+                    onAddToShoppingList={addToShoppingList}
+                  />
+                } />
                 <Route path="/shopping-list" element={<ShoppingList />} />
               </Routes>
             </main>

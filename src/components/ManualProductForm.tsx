@@ -31,6 +31,7 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
     e.preventDefault();
     onSubmit({
       ...formData,
+      location: Array.isArray(formData.location) ? formData.location.join(', ') : formData.location,
       categories: selectedCategories.join(', '),
       nutriscore: undefined,
       nutriments: {

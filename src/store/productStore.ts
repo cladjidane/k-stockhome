@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -16,9 +15,14 @@ interface ProductStore {
   removeProduct: (id: string) => Promise<void>;
   setSelectedCategory: (category: string | null) => void;
   setSearchQuery: (query: string) => void;
-  addToShoppingList: (item: Omit<ShoppingListItem, "id" | "addedAt">) => Promise<void>;
+  addToShoppingList: (
+    item: Omit<ShoppingListItem, "id" | "addedAt">,
+  ) => Promise<void>;
   removeFromShoppingList: (id: string) => Promise<void>;
-  updateShoppingItem: (id: string, updates: Partial<ShoppingListItem>) => Promise<void>;
+  updateShoppingItem: (
+    id: string,
+    updates: Partial<ShoppingListItem>,
+  ) => Promise<void>;
   getFilteredProducts: () => Product[];
   fetchShoppingList: () => Promise<void>;
 }
@@ -45,7 +49,9 @@ export const useStore = create<ProductStore>((set, get) => ({
   fetchShoppingList: async () => {
     set({ isLoading: true });
     try {
-      const { data, error } = await supabase().from("shopping_list").select("*");
+      const { data, error } = await supabase()
+        .from("shopping_list")
+        .select("*");
       if (error) throw error;
       console.log("Fetched shopping list:", data);
       set({ shoppingList: data, isLoading: false });
@@ -57,26 +63,28 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   addToShoppingList: async (item) => {
     try {
-      const { data: existing } = await supabase
+      const { data: existing } = await supabase()
         .from("shopping_list")
         .select()
-        .eq('product_id', item.product_id)
+        .eq("product_id", item.product_id)
         .single();
 
       if (existing) {
-        console.log('Item already in shopping list');
+        console.log("Item already in shopping list");
         return;
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await supabase()
         .from("shopping_list")
-        .insert([{
-          product_id: item.product_id,
-          name: item.name,
-          quantity: item.quantity || 1,
-          unit: item.unit,
-          auto_update_stock: true,
-        }])
+        .insert([
+          {
+            product_id: item.product_id,
+            name: item.name,
+            quantity: item.quantity || 1,
+            unit: item.unit,
+            auto_update_stock: true,
+          },
+        ])
         .select()
         .single();
 
@@ -89,7 +97,7 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   addProduct: async (product) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabase()
         .from("products")
         .insert([product])
         .select()
@@ -104,14 +112,14 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   updateProduct: async (id, updates) => {
     try {
-      const { error } = await supabase
+      const { error } = await supabase()
         .from("products")
         .update(updates)
         .eq("id", id);
       if (error) throw error;
       set((state) => ({
         products: state.products.map((p) =>
-          p.id === id ? { ...p, ...updates } : p
+          p.id === id ? { ...p, ...updates } : p,
         ),
       }));
     } catch (error) {
@@ -121,7 +129,7 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   removeProduct: async (id) => {
     try {
-      const { error } = await supabase.from("products").delete().eq("id", id);
+      const { error } = await supabase().from("products").delete().eq("id", id);
       if (error) throw error;
       set((state) => ({
         products: state.products.filter((p) => p.id !== id),
@@ -133,7 +141,7 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   removeFromShoppingList: async (id) => {
     try {
-      const { error } = await supabase
+      const { error } = await supabase()
         .from("shopping_list")
         .delete()
         .eq("id", id);
@@ -148,14 +156,14 @@ export const useStore = create<ProductStore>((set, get) => ({
 
   updateShoppingItem: async (id, updates) => {
     try {
-      const { error } = await supabase
+      const { error } = await supabase()
         .from("shopping_list")
         .update(updates)
         .eq("id", id);
       if (error) throw error;
       set((state) => ({
         shoppingList: state.shoppingList.map((i) =>
-          i.id === id ? { ...i, ...updates } : i
+          i.id === id ? { ...i, ...updates } : i,
         ),
       }));
     } catch (error) {
@@ -171,19 +179,19 @@ export const useStore = create<ProductStore>((set, get) => ({
     return products.filter((product) => {
       const matchesCategory =
         !selectedCategory || product.category === selectedCategory;
-      
+
       if (!searchQuery) return matchesCategory;
-      
+
       const query = searchQuery.toLowerCase();
       const name = product.name.toLowerCase();
-      
+
       // Vérifie si le nom commence par la recherche
       const startsWithMatch = name.startsWith(query);
       // Vérifie si le nom contient les mots de la recherche
-      const containsMatch = query.split(' ').every(word => 
-        name.includes(word.toLowerCase())
-      );
-      
+      const containsMatch = query
+        .split(" ")
+        .every((word) => name.includes(word.toLowerCase()));
+
       return matchesCategory && (startsWithMatch || containsMatch);
     });
   },
@@ -191,13 +199,15 @@ export const useStore = create<ProductStore>((set, get) => ({
   getSuggestions: (query: string) => {
     const { products } = get();
     if (!query) return [];
-    
+
     const normalizedQuery = query.toLowerCase();
-    return [...new Set(
-      products
-        .filter(p => p.name.toLowerCase().includes(normalizedQuery))
-        .map(p => p.name)
-        .slice(0, 5)
-    )];
+    return [
+      ...new Set(
+        products
+          .filter((p) => p.name.toLowerCase().includes(normalizedQuery))
+          .map((p) => p.name)
+          .slice(0, 5),
+      ),
+    ];
   },
 }));

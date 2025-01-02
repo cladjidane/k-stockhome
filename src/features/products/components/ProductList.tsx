@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Product } from "../../../types";
 import CategoryGroup from "../../../components/CategoryGroup";
 import { useStore } from "../../../store/productStore";
-import CategoryFilters from "./CategoryFilters";
 
 interface ProductListProps {
   products: Product[];
@@ -21,16 +20,17 @@ export default function ProductList({
   onAddToShoppingList,
 }: ProductListProps) {
   const { mainCategories } = useStore();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [groupedProducts, setGroupedProducts] = useState<Record<string, Product[]>>({});
 
   useEffect(() => {
     // Filtrer les produits selon la recherche
-    const filteredProducts = products.filter(product => 
-      product.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .includes(searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
-    );
+    const filteredProducts = searchTerm 
+      ? products.filter(product => 
+          product.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .includes(searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+        )
+      : products;
 
     // Grouper les produits par catégorie
     const groups: Record<string, Product[]> = {};
@@ -57,7 +57,6 @@ export default function ProductList({
         }
       }
 
-      // Si aucune correspondance n'est trouvée, mettre dans "Autres"
       if (!assigned) {
         if (!groups['Autres']) {
           groups['Autres'] = [];
@@ -67,12 +66,7 @@ export default function ProductList({
     });
 
     setGroupedProducts(groups);
-  }, [products, mainCategories]);
-
-  // Filtrer les produits si une catégorie est sélectionnée
-  const filteredGroups = selectedCategory
-    ? { [selectedCategory]: groupedProducts[selectedCategory] || [] }
-    : groupedProducts;
+  }, [products, mainCategories, searchTerm]);
 
   return (
     <div className="py-16">
@@ -85,14 +79,9 @@ export default function ProductList({
           className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800"
         />
       </div>
-      <CategoryFilters
-        categories={Object.keys(mainCategories)}
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
 
       <div className="space-y-4">
-        {Object.entries(filteredGroups).map(([category, categoryProducts]) => (
+        {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
           <CategoryGroup
             key={category}
             title={category}

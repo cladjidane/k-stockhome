@@ -212,4 +212,4 @@ export const useStore = create<ProductStore>((set, get) => ({
   },
 }));
 
-export const { updateProduct, removeProduct, addToShoppingList } = useStore.getState();
+export const { updateProduct, removeProduct, addToShoppingList, removeFromShoppingList } = useStore.getState();

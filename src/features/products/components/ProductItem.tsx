@@ -74,14 +74,17 @@ export default function ProductItem({
     const shoppingListItem = shoppingList.find(
       (item) => item.product_id === product.id,
     );
-    const currentQuantity = shoppingListItem?.quantity || 0;
 
-    addToShoppingList({
-      product_id: product.id,
-      name: product.name,
-      quantity: currentQuantity + 1,
-      unit: product.unit,
-    });
+    if (shoppingListItem) {
+      updateShoppingItem(shoppingListItem.id, { quantity: shoppingListItem.quantity + 1 });
+    } else {
+      addToShoppingList({
+        product_id: product.id,
+        name: product.name,
+        quantity: 1,
+        unit: product.unit,
+      });
+    }
 
     const toast = document.createElement("div");
     toast.className =

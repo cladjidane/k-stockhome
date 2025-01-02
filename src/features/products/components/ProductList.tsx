@@ -22,12 +22,19 @@ export default function ProductList({
 }: ProductListProps) {
   const { mainCategories } = useStore();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [groupedProducts, setGroupedProducts] = useState<Record<string, Product[]>>({});
 
   useEffect(() => {
+    // Filtrer les produits selon la recherche
+    const filteredProducts = products.filter(product => 
+      product.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .includes(searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+    );
+
     // Grouper les produits par catégorie
     const groups: Record<string, Product[]> = {};
-    products.forEach((product) => {
+    filteredProducts.forEach((product) => {
       // Normalisation de la catégorie
       const productCategories = (product.category || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       let assigned = false;
@@ -69,6 +76,15 @@ export default function ProductList({
 
   return (
     <div className="py-16">
+      <div className="mb-4">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Rechercher un produit..."
+          className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800"
+        />
+      </div>
       <CategoryFilters
         categories={Object.keys(mainCategories)}
         selectedCategory={selectedCategory}

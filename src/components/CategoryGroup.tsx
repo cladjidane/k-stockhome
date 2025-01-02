@@ -46,7 +46,7 @@ export default function CategoryGroup({
       initial="hidden"
       animate="show"
       variants={container}
-      className="rounded-xl mb-4 overflow-hidden transition-all duration-200 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700"
+      className="rounded-xl mb-4 transition-all duration-200 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700"
     >
       <button
         onClick={() => setIsExpanded(!isExpanded)}

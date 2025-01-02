@@ -94,6 +94,9 @@ export default function ProductList({
   return (
     <AnimatedTransition animation="fade">
       <div className="space-y-4 py-16">
+        <div className="mb-4">
+          <SearchBar displayProduct={false} />
+        </div>
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {availableLocations.map((location) => (

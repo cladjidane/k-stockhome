@@ -57,39 +57,11 @@ function App() {
             {/* Search Bar */}
             <div className="absolute -bottom-7 left-4 right-4">
               <div className="max-w-2xl mx-auto">
-                <div className="">
-                  <AutocompleteInput
-                    suggestions={products.map((p) => p.name)}
-                    selectedItem={searchQuery}
-                    onItemChange={setSearchQuery}
-                    placeholder="Rechercher un produit..."
-                    name="search"
-                    label=""
-                  />
-                </div>
+                <SearchBar displayProduct={true} />
               </div>
             </div>
           </header>
           <div className="max-w-2xl mx-auto px-4 pb-safe-bottom">
-            {searchQuery && (
-              <div className="mt-4">
-                {products
-                  .filter((p) => p.name === searchQuery)
-                  .map((product) => (
-                    <ProductItem
-                      key={product.id}
-                      product={product}
-                      onDelete={removeProduct}
-                      onUpdateQuantity={(id, quantity) =>
-                        updateProduct(id, { quantity })
-                      }
-                      onUpdateLocation={(id, location) =>
-                        updateProduct(id, { location })
-                      }
-                    />
-                  ))}
-              </div>
-            )}
 
             <Routes>
               <Route

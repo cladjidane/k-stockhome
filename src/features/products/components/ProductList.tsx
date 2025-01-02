@@ -23,14 +23,19 @@ export default function ProductList({
   const [searchTerm, setSearchTerm] = useState("");
   const [groupedProducts, setGroupedProducts] = useState<Record<string, Product[]>>({});
 
+  // Trier les produits une seule fois par ordre alphabétique
+  const sortedProducts = [...products].sort((a, b) => 
+    a.name.localeCompare(b.name, 'fr', { ignorePunctuation: true, sensitivity: 'base' })
+  );
+
   useEffect(() => {
     // Filtrer les produits selon la recherche
     const filteredProducts = searchTerm 
-      ? products.filter(product => 
+      ? sortedProducts.filter(product => 
           product.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .includes(searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
         )
-      : products;
+      : sortedProducts;
 
     // Grouper les produits par catégorie
     const groups: Record<string, Product[]> = {};

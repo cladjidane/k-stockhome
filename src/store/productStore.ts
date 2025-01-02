@@ -27,6 +27,8 @@ interface ProductStore {
   fetchShoppingList: () => Promise<void>;
 }
 
+export const { updateProduct, removeProduct, addToShoppingList } = useStore.getState();
+
 export const useStore = create<ProductStore>((set, get) => ({
   products: [],
   shoppingList: [],

@@ -7,7 +7,11 @@ import ProductList from "./features/products/components/ProductList";
 import ShoppingList from "./features/shopping-list/components/ShoppingList";
 import { useStore } from "./store/productStore";
 import AutocompleteInput from "./components/AutocompleteInput";
-import { updateProduct, removeProduct, addToShoppingList } from "./store/productStore";
+import {
+  updateProduct,
+  removeProduct,
+  addToShoppingList,
+} from "./store/productStore";
 
 function App() {
   const {
@@ -28,40 +32,36 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
-          <div className="max-w-lg mx-auto px-4 pb-safe-bottom">
-            {/* Header */}
-            <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white p-8 rounded-xl shadow-lg relative mb-16">
+          {/* Header */}
+          <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white shadow-lg relative mb-16">
+            <div className="max-w-2xl mx-auto py-8 pb-24">
+              <h1 className="text-4xl font-display font-bold tracking-tight">
+                Le Placard à Ju
+              </h1>
+              <p className="text-lg text-primary-50 font-light">
+                Gérez votre inventaire facilement
+              </p>
+            </div>
+
+            {/* Search Bar */}
+            <div className="absolute -bottom-7 left-4 right-4">
               <div className="max-w-2xl mx-auto">
-                <h1 className="text-4xl font-display font-bold mb-3 tracking-tight">
-                  Le Placard à Ju
-                </h1>
-                <p className="text-lg text-primary-50 font-light">
-                  Gérez votre inventaire facilement
-                </p>
-              </div>
-              
-              {/* Search Bar */}
-              <div className="absolute -bottom-6 left-4 right-4">
-                <div className="max-w-2xl mx-auto">
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-2">
-              <AutocompleteInput
-                      suggestions={products.map((p) => p.name)}
-                      selectedItem={searchQuery}
-                      onItemChange={setSearchQuery}
-                      placeholder="Rechercher un produit..."
-                      name="search"
-                      label=""
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                      <Search className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </div>
+                <div className="">
+                  <AutocompleteInput
+                    suggestions={products.map((p) => p.name)}
+                    selectedItem={searchQuery}
+                    onItemChange={setSearchQuery}
+                    placeholder="Rechercher un produit..."
+                    name="search"
+                    label=""
+                  />
                 </div>
               </div>
-            </header>
-
+            </div>
+          </header>
+          <div className="max-w-2xl mx-auto pb-safe-bottom pb-16">
             {/* Categories */}
-            <div className="mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg">
+            <div className="mb-8 dark:bg-gray-800 rounded-lg">
               {" "}
               {/*Added background color and padding for better visibility */}
               <div className="flex items-center justify-between mb-4">
@@ -96,31 +96,6 @@ function App() {
                 )}
               </div>
             </div>
-
-            {/* Main Content */}
-            <main className="mb-20 bg-white dark:bg-gray-800 p-4 rounded-lg">
-              {" "}
-              {/*Added background color and padding for better visibility */}
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <ProductList
-                      products={products}
-                      onUpdateQuantity={(id, quantity) =>
-                        updateProduct(id, { quantity })
-                      }
-                      onUpdateLocation={(id, location) =>
-                        updateProduct(id, { location })
-                      }
-                      onDelete={removeProduct}
-                      onAddToShoppingList={addToShoppingList}
-                    />
-                  }
-                />
-                <Route path="/shopping-list" element={<ShoppingList />} />
-              </Routes>
-            </main>
 
             {/* Bottom Navigation */}
             <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 pb-safe-bottom">

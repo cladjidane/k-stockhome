@@ -113,7 +113,7 @@ export default function AutocompleteInput({
       </label>
       <div className="mt-1">
         <div
-          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+          className="w-full p-4 shadow-xl rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600  bg-white"
           onClick={() => {
             inputRef.current?.focus();
             setInputValue("");
@@ -124,7 +124,7 @@ export default function AutocompleteInput({
             ref={inputRef}
             type="text"
             id={name}
-            className="flex-1 outline-none min-w-[120px] bg-transparent"
+            className="text-black flex-1 outline-none w-full"
             value={inputValue}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
@@ -161,7 +161,7 @@ export default function AutocompleteInput({
               role="option"
               tabIndex={0}
             >
-              <span className="block truncate">{suggestion}</span>
+              <span className="text-black block truncate">{suggestion}</span>
             </div>
           ))}
         </div>

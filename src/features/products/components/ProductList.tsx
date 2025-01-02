@@ -93,16 +93,8 @@ export default function ProductList({
 
   return (
     <AnimatedTransition animation="fade">
-      <div className="space-y-4">
+      <div className="space-y-4 ">
         <div className="space-y-4">
-          {/**** Categories Filters
-          <CategoryFilters
-            categories={allCategories}
-            selectedCategories={selectedCategories}
-            onCategoryToggle={handleCategoryToggle}
-          />
-           ****/}
-
           <div className="flex flex-wrap gap-2">
             {availableLocations.map((location) => (
               <button

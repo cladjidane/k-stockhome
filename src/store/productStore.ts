@@ -70,25 +70,28 @@ export const useStore = create<ProductStore>((set, get) => ({
         .single();
 
       if (existing) {
-        console.log("Item already in shopping list");
-        return;
-      }
+        // Met à jour la quantité si l'article existe déjà
+        const { error } = await supabase()
+          .from("shopping_list")
+          .update({ quantity: item.quantity })
+          .eq("product_id", item.product_id);
 
-      const { data, error } = await supabase()
-        .from("shopping_list")
-        .insert([
-          {
+        if (error) throw error;
+      } else {
+        // Insère un nouvel article
+        const { error } = await supabase()
+          .from("shopping_list")
+          .insert([{
             product_id: item.product_id,
             name: item.name,
             quantity: item.quantity || 1,
             unit: item.unit,
             auto_update_stock: true,
-          },
-        ])
-        .select()
-        .single();
+          }]);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
+      
       await get().fetchShoppingList();
     } catch (error) {
       set({ error: (error as Error).message });

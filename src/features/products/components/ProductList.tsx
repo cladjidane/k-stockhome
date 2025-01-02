@@ -76,7 +76,7 @@ export default function ProductList({
 
       return matchesCategories && matchesLocations && matchesSearch;
     });
-  }, [products, selectedCategories, selectedLocations]);
+  }, [products, selectedCategories, selectedLocations, searchQuery]);
 
   const handleCategoryToggle = (category: string) => {
     setSelectedCategories((prev) => {

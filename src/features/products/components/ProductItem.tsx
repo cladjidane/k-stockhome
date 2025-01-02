@@ -48,7 +48,7 @@ export default function ProductItem({
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationMenuRef = useRef<HTMLDivElement>(null);
-  const { addToShoppingList } = useStore();
+  const { addToShoppingList, shoppingList } = useStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -68,16 +68,26 @@ export default function ProductItem({
   }, [product.quantity]);
 
   const handleAddToShoppingList = () => {
+    const shoppingListItem = shoppingList.find(item => item.product_id === product.id);
+    const currentQuantity = shoppingListItem?.quantity || 0;
+    
     addToShoppingList({
       product_id: product.id,
       name: product.name,
-      quantity: 1,
+      quantity: currentQuantity + 1,
       unit: product.unit,
     });
+
     const toast = document.createElement("div");
     toast.className =
-      "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500";
-    toast.textContent = "Produit ajouté au panier";
+      "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500 flex items-center gap-2";
+    toast.innerHTML = `
+      <span>✓</span>
+      <div>
+        <div class="font-medium">${product.name}</div>
+        <div class="text-sm opacity-90">Ajouté au panier (${currentQuantity + 1} ${product.unit})</div>
+      </div>
+    `;
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = "0";

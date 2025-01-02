@@ -12,7 +12,7 @@ interface ManualProductFormProps {
 }
 
 export default function ManualProductForm({ onSubmit, onCancel }: ManualProductFormProps) {
-  const { categories, labels, fetchCategories, fetchLabels, addCategory, addLabel } = useStore();
+  const { mainCategories, fetchCategories } = useStore();
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -22,11 +22,9 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
   });
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
 
   useEffect(() => {
     fetchCategories();
-    fetchLabels();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,7 +32,6 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
     onSubmit({
       ...formData,
       categories: selectedCategories.join(', '),
-      labels: selectedLabels.join(', '),
       nutriscore: undefined,
       nutriments: {
         energy_100g: 0,
@@ -53,21 +50,9 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
     }));
   };
 
-  const handleCategoryChange = async (items: string[]) => {
-    setSelectedCategories(items);
-    const newCategories = items.filter(cat => !categories.includes(cat));
-    for (const newCat of newCategories) {
-      await addCategory(newCat);
-    }
-  };
-
-  const handleLabelChange = async (items: string[]) => {
-    setSelectedLabels(items);
-    const newLabels = items.filter(label => !labels.includes(label));
-    for (const newLabel of newLabels) {
-      await addLabel(newLabel);
-    }
-  };
+  const allCategories = Object.entries(mainCategories).reduce((acc, [main, sub]) => {
+    return [...acc, main, ...sub];
+  }, [] as string[]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -150,21 +135,11 @@ export default function ManualProductForm({ onSubmit, onCancel }: ManualProductF
       <AutocompleteInput
         name="categories"
         label="Catégories"
-        suggestions={categories}
+        suggestions={allCategories}
         selectedItems={selectedCategories}
-        onItemsChange={handleCategoryChange}
+        onItemsChange={setSelectedCategories}
         placeholder="Ajouter une catégorie"
-        helpText="Appuyez sur Entrée pour ajouter une nouvelle catégorie"
-      />
-
-      <AutocompleteInput
-        name="labels"
-        label="Labels"
-        suggestions={labels}
-        selectedItems={selectedLabels}
-        onItemsChange={handleLabelChange}
-        placeholder="Ajouter un label"
-        helpText="Appuyez sur Entrée pour ajouter un nouveau label"
+        helpText="Sélectionnez une catégorie"
       />
 
       <div className="flex justify-end space-x-3 pt-4">

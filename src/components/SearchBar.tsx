@@ -13,6 +13,10 @@ interface SearchBarProps {
 export default function SearchBar({ displayProduct = false }: SearchBarProps) {
   const { products, searchQuery, setSearchQuery } = useStore();
 
+  const normalizeString = (str: string) => {
+    return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  };
+
   return (
     <div className="w-full">
       <AutocompleteInput
@@ -27,7 +31,7 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
       {displayProduct && searchQuery && (
         <div className="mt-4">
           {products
-            .filter((p) => p.name === searchQuery)
+            .filter((p) => normalizeString(p.name).includes(normalizeString(searchQuery)))
             .map((product) => (
               <ProductItem
                 key={product.id}

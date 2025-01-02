@@ -8,16 +8,18 @@ interface AutocompleteInputProps {
   label: string;
   helpText?: string;
   name: string;
+  normalizeFunction: (str: string) => string;
 }
 
 export default function AutocompleteInput({
   suggestions,
-  selectedItem,
+  selectedItem = "",
   onItemChange,
   placeholder,
   label,
   helpText,
   name,
+  normalizeFunction = (str: string) => str.toLowerCase(),
 }: AutocompleteInputProps) {
   const [inputValue, setInputValue] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -29,11 +31,11 @@ export default function AutocompleteInput({
   useEffect(() => {
     const filtered = suggestions
       .filter((suggestion) =>
-        suggestion.toLowerCase().includes(inputValue.toLowerCase()),
+        normalizeFunction(suggestion).includes(normalizeFunction(inputValue)),
       )
       .slice(0, 5);
     setFilteredSuggestions(filtered);
-  }, [inputValue, suggestions]);
+  }, [inputValue, suggestions, normalizeFunction]);
 
   useEffect(() => {
     setInputValue(selectedItem || "");

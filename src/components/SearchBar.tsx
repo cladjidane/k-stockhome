@@ -29,6 +29,7 @@ export default function SearchBar({ displayProduct = false }: SearchBarProps) {
         suggestions={products.map((p) => p.name)}
         selectedItem={searchQuery}
         onItemChange={setSearchQuery}
+        normalizeFunction={normalizeString}
         placeholder="Rechercher un produit..."
         name="search"
         label=""

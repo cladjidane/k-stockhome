@@ -51,7 +51,7 @@ export default function ProductItem({
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationMenuRef = useRef<HTMLDivElement>(null);
-  const { addToShoppingList, shoppingList, onUpdateQuantity } = useStore();
+  const { addToShoppingList, shoppingList } = useStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

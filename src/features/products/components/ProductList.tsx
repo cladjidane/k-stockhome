@@ -48,6 +48,8 @@ export default function ProductList({
     return Array.from(categories).sort();
   }, [products]);
 
+  const { searchQuery } = useStore();
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategories =
@@ -68,7 +70,10 @@ export default function ProductList({
         selectedLocations.length === 0 ||
         selectedLocations.some((loc) => locations.includes(loc));
 
-      return matchesCategories && matchesLocations;
+      const matchesSearch = !searchQuery || 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesCategories && matchesLocations && matchesSearch;
     });
   }, [products, selectedCategories, selectedLocations]);
 
@@ -95,6 +100,9 @@ export default function ProductList({
   return (
     <AnimatedTransition animation="fade">
       <div className="space-y-4 py-16">
+        <div className="mb-4">
+          <SearchBar displayProduct={false} />
+        </div>
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {availableLocations.map((location) => (

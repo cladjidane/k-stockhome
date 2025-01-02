@@ -36,7 +36,7 @@ function App() {
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
           {/* Header */}
           <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white shadow-lg relative mb-16">
-            <div className="max-w-2xl mx-auto py-8 pb-24">
+            <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
               <h1 className="text-4xl font-display font-bold tracking-tight">
                 Le Placard à Ju
               </h1>
@@ -61,21 +61,30 @@ function App() {
               </div>
             </div>
           </header>
-          <div className="max-w-2xl mx-auto pb-safe-bottom pb-16">
+          <div className="max-w-2xl mx-auto px-4 pb-safe-bottom pb-16">
             <Routes>
-              <Route path="/" element={
-                <div className="mb-8 dark:bg-gray-800 rounded-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Emplacements
-                    </h2>
-                    <NavLink to="/products" className="text-primary-600 text-sm font-medium">
-                      Voir tout
-                    </NavLink>
-                  </div>
-                  <div className="grid grid-cols-4 gap-4">
-                    {["Réfrigérateur", "Congélateur", "Placard", "Tiroir"].map(
-                      (location) => (
+              <Route
+                path="/"
+                element={
+                  <div className="mb-8 dark:bg-gray-800 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                        Emplacements
+                      </h2>
+                      <NavLink
+                        to="/products"
+                        className="text-primary-600 text-sm font-medium"
+                      >
+                        Voir tout
+                      </NavLink>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4">
+                      {[
+                        "Réfrigérateur",
+                        "Congélateur",
+                        "Placard",
+                        "Tiroir",
+                      ].map((location) => (
                         <button
                           key={location}
                           className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -93,30 +102,40 @@ function App() {
                             {location}
                           </span>
                         </button>
-                      ),
-                    )}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              } />
-              <Route path="/products" element={
-                <ProductList
-                  products={products}
-                  onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
-                  onUpdateLocation={(id, location) => updateProduct(id, { location })}
-                  onDelete={removeProduct}
-                  onAddToShoppingList={addToShoppingList}
-                />
-              } />
-              <Route path="/cart" element={
-                <ShoppingList
-                  items={shoppingList}
-                  products={products}
-                  onRemoveItem={removeFromShoppingList}
-                  onUpdateQuantity={updateShoppingItem}
-                  onUpdateProduct={updateProduct}
-                  onPurchaseComplete={removeFromShoppingList}
-                />
-              } />
+                }
+              />
+              <Route
+                path="/products"
+                element={
+                  <ProductList
+                    products={products}
+                    onUpdateQuantity={(id, quantity) =>
+                      updateProduct(id, { quantity })
+                    }
+                    onUpdateLocation={(id, location) =>
+                      updateProduct(id, { location })
+                    }
+                    onDelete={removeProduct}
+                    onAddToShoppingList={addToShoppingList}
+                  />
+                }
+              />
+              <Route
+                path="/cart"
+                element={
+                  <ShoppingList
+                    items={shoppingList}
+                    products={products}
+                    onRemoveItem={removeFromShoppingList}
+                    onUpdateQuantity={updateShoppingItem}
+                    onUpdateProduct={updateProduct}
+                    onPurchaseComplete={removeFromShoppingList}
+                  />
+                }
+              />
             </Routes>
 
             {/* Bottom Navigation */}
@@ -133,10 +152,7 @@ function App() {
                   <Search className="w-6 h-6" />
                   <span className="text-xs mt-1">Rechercher</span>
                 </NavLink>
-                <NavLink
-                  to="/cart"
-                  className="p-2 flex flex-col items-center"
-                >
+                <NavLink to="/cart" className="p-2 flex flex-col items-center">
                   <ShoppingCart className="w-6 h-6" />
                   <span className="text-xs mt-1">Liste</span>
                 </NavLink>

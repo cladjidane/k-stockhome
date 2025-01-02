@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -80,17 +79,19 @@ export const useStore = create<ProductStore>((set, get) => ({
       } else {
         const { error } = await supabase()
           .from("shopping_list")
-          .insert([{
-            product_id: item.product_id,
-            name: item.name,
-            quantity: item.quantity || 1,
-            unit: item.unit,
-            auto_update_stock: true,
-          }]);
+          .insert([
+            {
+              product_id: item.product_id,
+              name: item.name,
+              quantity: item.quantity || 1,
+              unit: item.unit,
+              auto_update_stock: true,
+            },
+          ]);
 
         if (error) throw error;
       }
-      
+
       await get().fetchShoppingList();
     } catch (error) {
       set({ error: (error as Error).message });
@@ -212,4 +213,10 @@ export const useStore = create<ProductStore>((set, get) => ({
   },
 }));
 
-export const { updateProduct, removeProduct, addToShoppingList, removeFromShoppingList } = useStore.getState();
+export const {
+  updateShoppingItem,
+  updateProduct,
+  removeProduct,
+  addToShoppingList,
+  removeFromShoppingList,
+} = useStore.getState();

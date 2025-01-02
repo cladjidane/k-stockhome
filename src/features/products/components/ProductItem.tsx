@@ -123,29 +123,43 @@ export default function ProductItem({ product, onDelete }: ProductItemProps) {
                 {product.name}
               </h3>
             </div>
-            <div className="mt-1 flex flex-wrap items-center gap-2">
+            <div className="mt-1 space-y-2">
               <div className="flex flex-wrap gap-2">
-                {Array.isArray(product.location) ? (
-                  product.location.map((loc) => {
-                    const style = locationColors[loc] || defaultLocationStyle;
-                    return (
-                      <div
-                        key={loc}
-                        className={`inline-flex items-center px-2 py-1 rounded-md ${style.bg} ${style.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
-                      >
-                        <span className="mr-1">{style.icon}</span>
-                        {loc}
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div
-                    className={`inline-flex items-center px-2 py-1 rounded-md ${locationStyle.bg} ${locationStyle.text} text-sm dark:bg-opacity-10 dark:text-opacity-90`}
-                  >
-                    <span className="mr-1">{locationStyle.icon}</span>
-                    {product.location}
-                  </div>
-                )}
+                {availableLocations.map((location) => {
+                  const style = locationColors[location] || defaultLocationStyle;
+                  const isSelected = Array.isArray(product.location) 
+                    ? product.location.includes(location)
+                    : product.location === location;
+                  
+                  return (
+                    <button
+                      key={location}
+                      onClick={() => {
+                        const locations = Array.isArray(product.location)
+                          ? product.location
+                          : [product.location];
+                        
+                        if (locations.includes(location)) {
+                          onUpdateLocation(product.id, 
+                            locations.filter(loc => loc !== location).join(',')
+                          );
+                        } else {
+                          onUpdateLocation(product.id, 
+                            [...locations, location].join(',')
+                          );
+                        }
+                      }}
+                      className={`inline-flex items-center px-2 py-1 rounded-md transition-colors ${
+                        isSelected 
+                          ? `${style.bg} ${style.text}`
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      } text-sm dark:bg-opacity-10 dark:text-opacity-90`}
+                    >
+                      <span className="mr-1">{style.icon}</span>
+                      {location}
+                    </button>
+                  );
+                })}
               </div>
               <div className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
                 {product.quantity} {product.unit}

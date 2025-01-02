@@ -60,42 +60,62 @@ function App() {
             </div>
           </header>
           <div className="max-w-2xl mx-auto pb-safe-bottom pb-16">
-            {/* Categories */}
-            <div className="mb-8 dark:bg-gray-800 rounded-lg">
-              {" "}
-              {/*Added background color and padding for better visibility */}
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Emplacements
-                </h2>
-                <button className="text-primary-600 text-sm font-medium">
-                  Voir tout
-                </button>
-              </div>
-              <div className="grid grid-cols-4 gap-4">
-                {["Réfrigérateur", "Congélateur", "Placard", "Tiroir"].map(
-                  (location) => (
-                    <button
-                      key={location}
-                      className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <span className="text-2xl mb-2">
-                        {location === "Réfrigérateur"
-                          ? "❄️"
-                          : location === "Congélateur"
-                            ? "🧊"
-                            : location === "Placard"
-                              ? "🏠"
-                              : "🗄️"}
-                      </span>
-                      <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
-                        {location}
-                      </span>
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
+            <Routes>
+              <Route path="/" element={
+                <div className="mb-8 dark:bg-gray-800 rounded-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      Emplacements
+                    </h2>
+                    <NavLink to="/products" className="text-primary-600 text-sm font-medium">
+                      Voir tout
+                    </NavLink>
+                  </div>
+                  <div className="grid grid-cols-4 gap-4">
+                    {["Réfrigérateur", "Congélateur", "Placard", "Tiroir"].map(
+                      (location) => (
+                        <button
+                          key={location}
+                          className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <span className="text-2xl mb-2">
+                            {location === "Réfrigérateur"
+                              ? "❄️"
+                              : location === "Congélateur"
+                                ? "🧊"
+                                : location === "Placard"
+                                  ? "🏠"
+                                  : "🗄️"}
+                          </span>
+                          <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                            {location}
+                          </span>
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+              } />
+              <Route path="/products" element={
+                <ProductList
+                  products={products}
+                  onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
+                  onUpdateLocation={(id, location) => updateProduct(id, { location })}
+                  onDelete={removeProduct}
+                  onAddToShoppingList={addToShoppingList}
+                />
+              } />
+              <Route path="/cart" element={
+                <ShoppingList
+                  items={shoppingList}
+                  products={products}
+                  onRemoveItem={removeFromShoppingList}
+                  onUpdateQuantity={updateShoppingItem}
+                  onUpdateProduct={updateProduct}
+                  onPurchaseComplete={removeFromShoppingList}
+                />
+              } />
+            </Routes>
 
             {/* Bottom Navigation */}
             <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 pb-safe-bottom">

@@ -31,7 +31,7 @@ function App() {
     fetchShoppingList,
     products,
     shoppingList,
-    searchQuery,
+    addProduct,
     setSearchQuery,
   } = useStore();
 
@@ -57,17 +57,19 @@ function App() {
 
             {/* Search Bar - Only on home page */}
             <Routes>
-              <Route path="/" element={
-                <div className="absolute -bottom-7 left-4 right-4">
-                  <div className="max-w-2xl mx-auto">
-                    <SearchBar displayProduct={true} />
+              <Route
+                path="/"
+                element={
+                  <div className="absolute -bottom-7 left-4 right-4">
+                    <div className="max-w-2xl mx-auto">
+                      <SearchBar displayProduct={true} />
+                    </div>
                   </div>
-                </div>
-              } />
+                }
+              />
             </Routes>
           </header>
           <div className="max-w-2xl mx-auto px-4 pb-safe-bottom">
-
             <Routes>
               <Route
                 path="/"

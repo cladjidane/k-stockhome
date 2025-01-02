@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { ShoppingCart, Check, X, AlertCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingListItem, Product } from '../types';
-import PurchaseValidation from './PurchaseValidation';
-import ShareButton from './ShareButton';
+import React, { useState } from "react";
+import { ShoppingCart, Check, X, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingListItem, Product } from "../types";
+import PurchaseValidation from "./PurchaseValidation";
+import ShareButton from "./ShareButton";
 
 interface ShoppingListProps {
   items: ShoppingListItem[];
@@ -20,23 +20,29 @@ export default function ShoppingList({
   onRemoveItem,
   onUpdateQuantity,
   onUpdateProduct,
-  onPurchaseComplete
+  onPurchaseComplete,
 }: ShoppingListProps) {
-  const [validatingItem, setValidatingItem] = useState<ShoppingListItem | null>(null);
+  const [validatingItem, setValidatingItem] = useState<ShoppingListItem | null>(
+    null,
+  );
 
   const handlePurchaseClick = (item: ShoppingListItem) => {
-    const product = products.find(p => p.id === item.productId);
+    const product = products.find((p) => p.id === item.productId);
     if (product) {
       const suggestedQuantity = Math.max(1, product.quantity);
       setValidatingItem({
         ...item,
         suggestedQuantity,
-        autoUpdateStock: true
+        autoUpdateStock: true,
       });
     }
   };
 
-  const handleValidatePurchase = (validated: boolean, quantity: number, updateStock: boolean) => {
+  const handleValidatePurchase = (
+    validated: boolean,
+    quantity: number,
+    updateStock: boolean,
+  ) => {
     if (validatingItem && validated) {
       if (updateStock) {
         onUpdateProduct(validatingItem.productId, quantity);
@@ -50,13 +56,15 @@ export default function ShoppingList({
     return (
       <div className="text-center py-8">
         <ShoppingCart className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-        <p className="text-gray-500 dark:text-gray-400">Votre liste de courses est vide</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          Votre liste de courses est vide
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-16">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
           Liste de courses ({items.length})
@@ -65,7 +73,7 @@ export default function ShoppingList({
       </div>
       <AnimatePresence>
         {items.map((item) => {
-          const product = products.find(p => p.id === item.productId);
+          const product = products.find((p) => p.id === item.productId);
           const isLowStock = product && product.quantity <= 2;
 
           return (
@@ -118,7 +126,7 @@ export default function ShoppingList({
         {validatingItem && (
           <PurchaseValidation
             item={validatingItem}
-            product={products.find(p => p.id === validatingItem.productId)!}
+            product={products.find((p) => p.id === validatingItem.productId)!}
             onValidate={handleValidatePurchase}
             onClose={() => setValidatingItem(null)}
           />

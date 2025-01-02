@@ -1,6 +1,14 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import { Package, ShoppingCart, Menu, Search, Home, User, Camera } from "lucide-react";
+import {
+  Package,
+  ShoppingCart,
+  Menu,
+  Search,
+  Home,
+  User,
+  Camera,
+} from "lucide-react";
 import { ThemeProvider } from "./shared/contexts/ThemeContext";
 import ProductForm from "./components/ProductForm";
 import ProductList from "./features/products/components/ProductList";
@@ -35,7 +43,7 @@ function App() {
       <BrowserRouter>
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
           {/* Header */}
-          <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white shadow-lg relative mb-16">
+          <header className="pt-safe-top bg-gradient-to-b from-primary-600 to-primary-500 text-white shadow-lg relative">
             <div className="max-w-2xl mx-auto px-4 py-8 pb-24">
               <h1 className="text-4xl font-display font-bold tracking-tight">
                 Le Placard à Ju
@@ -61,18 +69,20 @@ function App() {
               </div>
             </div>
           </header>
-          <div className="max-w-2xl mx-auto px-4 pb-safe-bottom pb-16">
+          <div className="max-w-2xl mx-auto px-4 pb-safe-bottom">
             <Routes>
               <Route
                 path="/"
                 element={
                   <div className="flex justify-center items-center my-8">
-                  <ProductForm 
-                    onAdd={(product) => addProduct(product)}
-                    products={products}
-                    onUpdateQuantity={(id, quantity) => updateProduct(id, { quantity })}
-                  />
-                </div>
+                    <ProductForm
+                      onAdd={(product) => addProduct(product)}
+                      products={products}
+                      onUpdateQuantity={(id, quantity) =>
+                        updateProduct(id, { quantity })
+                      }
+                    />
+                  </div>
                 }
               />
               <Route

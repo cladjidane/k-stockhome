@@ -93,7 +93,7 @@ export default function ProductList({
 
   return (
     <AnimatedTransition animation="fade">
-      <div className="space-y-4 ">
+      <div className="space-y-4 py-16">
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {availableLocations.map((location) => (

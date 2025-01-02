@@ -1,33 +1,36 @@
+import { Camera, Plus } from "lucide-react";
+import React, { useState } from "react";
 
-import { Camera, Plus } from 'lucide-react';
-import React, { useState } from 'react';
-
-import { Product } from '../types';
-import BarcodeScanner from '../features/products/components/BarcodeScanner';
+import { Product } from "../types";
+import BarcodeScanner from "../features/products/components/BarcodeScanner";
 
 interface ProductFormProps {
-  onAdd: (product: Omit<Product, 'id'>) => void;
+  onAdd: (product: Omit<Product, "id">) => void;
   products: Product[];
   onUpdateQuantity: (id: string, quantity: number) => void;
 }
 
-export default function ProductForm({ onAdd, products, onUpdateQuantity }: ProductFormProps) {
+export default function ProductForm({
+  onAdd,
+  products,
+  onUpdateQuantity,
+}: ProductFormProps) {
   const [showScanner, setShowScanner] = useState(false);
 
-  const handleProductScanned = (scannedProduct: Omit<Product, 'id'>) => {
-    console.log('Product scanned:', scannedProduct);
+  const handleProductScanned = (scannedProduct: Omit<Product, "id">) => {
+    console.log("Product scanned:", scannedProduct);
     const productWithDefaults = {
-      name: '',
+      name: "",
       quantity: 1,
-      unit: 'unité',
+      unit: "unité",
       ...scannedProduct,
-      category: scannedProduct.categories?.toLowerCase().includes('ingredients') 
-        ? 'ingredient' 
-        : 'product',
-      categories: scannedProduct.categories
+      category: scannedProduct.categories?.toLowerCase().includes("ingredients")
+        ? "ingredient"
+        : "product",
+      categories: scannedProduct.categories,
     };
-    
-    console.log('Sending product to store:', productWithDefaults);
+
+    console.log("Sending product to store:", productWithDefaults);
     onAdd(productWithDefaults);
     setShowScanner(false);
   };
@@ -37,9 +40,9 @@ export default function ProductForm({ onAdd, products, onUpdateQuantity }: Produ
       <button
         type="button"
         onClick={() => setShowScanner(true)}
-        className="flex flex-col items-center justify-center p-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all"
+        className="bg-white/50 flex flex-col items-center text-neutral-600 justify-center p-8 border border-4 border-neutral-600 rounded-xl transition-all"
       >
-        <Camera className="w-16 h-16 mb-4" />
+        <Camera className="w-16 h-16 mb-4 text-neutral-600" />
         <span className="text-lg font-medium">Scanner un produit</span>
       </button>
 

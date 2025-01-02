@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +10,18 @@
 }
 
 @layer components {
+  .header-container {
+    @apply relative bg-background-light dark:bg-background-dark pb-24;
+  }
+
+  .header-content {
+    @apply pt-safe-top px-4;
+  }
+
+  .main-container {
+    @apply relative -mt-16 bg-white dark:bg-gray-800 min-h-screen rounded-t-[2rem] px-4 pt-12 pb-safe-bottom;
+  }
+  
   .input-search {
     @apply w-full px-4 py-3 bg-white/90 dark:bg-gray-700/90 border-0 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 dark:text-white transition-all duration-200;
   }

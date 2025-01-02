@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import { Package, ShoppingCart, Menu, Search, Home, User } from "lucide-react";
@@ -23,11 +22,11 @@ function App() {
         <div className="min-h-screen bg-background-light dark:bg-background-dark">
           <div className="max-w-lg mx-auto px-4 pb-safe-bottom">
             {/* Header */}
-            <header className="pt-safe-top mb-8">
-              <h1 className="text-4xl font-display font-bold text-gray-900 dark:text-white mb-2">
+            <header className="pt-safe-top mb-8 bg-primary-500 text-white p-4 rounded-lg"> {/* Added background color and padding */}
+              <h1 className="text-3xl font-display font-bold mb-2"> {/*Slightly reduced text size */}
                 Le Placard à Ju
               </h1>
-              <p className="text-gray-600 dark:text-gray-300">
+              <p className="text-lg"> {/*Increased text size for better readability*/}
                 Gérez votre inventaire facilement
               </p>
             </header>
@@ -41,6 +40,7 @@ function App() {
                 placeholder="Rechercher un produit..."
                 name="search"
                 label=""
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600" {/* Added styling for input */}
               />
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
                 <Search className="w-5 h-5 text-gray-400" />
@@ -48,7 +48,7 @@ function App() {
             </div>
 
             {/* Categories */}
-            <div className="mb-8">
+            <div className="mb-8 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/*Added background color and padding for better visibility */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Emplacements
@@ -61,12 +61,12 @@ function App() {
                 {['Réfrigérateur', 'Congélateur', 'Placard', 'Tiroir'].map((location) => (
                   <button
                     key={location}
-                    className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm"
+                    className="aspect-square rounded-card bg-white dark:bg-gray-800 p-4 flex flex-col items-center justify-center shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700" {/* Added hover effect */}
                   >
                     <span className="text-2xl mb-2">
-                      {location === 'Réfrigérateur' ? '❄️' : 
-                       location === 'Congélateur' ? '🧊' :
-                       location === 'Placard' ? '🏠' : '🗄️'}
+                      {location === 'Réfrigérateur' ? '❄️' :
+                        location === 'Congélateur' ? '🧊' :
+                        location === 'Placard' ? '🏠' : '🗄️'}
                     </span>
                     <span className="text-xs text-gray-600 dark:text-gray-300 text-center">
                       {location}
@@ -77,7 +77,7 @@ function App() {
             </div>
 
             {/* Main Content */}
-            <main className="mb-20">
+            <main className="mb-20 bg-white dark:bg-gray-800 p-4 rounded-lg"> {/*Added background color and padding for better visibility */}
               <Routes>
                 <Route path="/" element={<ProductList products={products} />} />
                 <Route path="/shopping-list" element={<ShoppingList />} />

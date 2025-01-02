@@ -10,7 +10,7 @@ import {
 import React, { useState, useEffect, useRef } from "react";
 import { Tooltip } from "../../../shared";
 import { Product } from "../../../types";
-import { useStore } from "../../../store/productStore";
+import { updateShoppingItem, useStore } from "../../../store/productStore";
 import { availableLocations } from "../../../utils/productUtils";
 
 interface ProductItemProps {
@@ -76,7 +76,9 @@ export default function ProductItem({
     );
 
     if (shoppingListItem) {
-      updateShoppingItem(shoppingListItem.id, { quantity: shoppingListItem.quantity + 1 });
+      updateShoppingItem(shoppingListItem.id, {
+        quantity: shoppingListItem.quantity + 1,
+      });
     } else {
       addToShoppingList({
         product_id: product.id,

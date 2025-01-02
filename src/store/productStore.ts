@@ -100,7 +100,117 @@ export const useStore = create<ProductStore>((set, get) => ({
     return 'Autres';
   },
 
-  // ... Rest of the existing store code ...
-}));
+  fetchProducts: async () => {
+    try {
+      const { data, error } = await supabase()
+        .from('products')
+        .select('*');
+      if (error) throw error;
+      set({ products: data });
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  },
 
-// ... Rest of the exports ...
+  fetchShoppingList: async () => {
+    try {
+      const { data, error } = await supabase()
+        .from('shopping_list')
+        .select('*')
+        .order('added_at', { ascending: false });
+      if (error) throw error;
+      set({ shoppingList: data });
+    } catch (error) {
+      console.error('Error fetching shopping list:', error);
+    }
+  },
+
+  addProduct: async (product) => {
+    try {
+      const { error } = await supabase()
+        .from('products')
+        .insert([product]);
+      if (error) throw error;
+      get().fetchProducts();
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
+  },
+
+  updateProduct: async (id: string, updates: Partial<Product>) => {
+    try {
+      const { error } = await supabase()
+        .from('products')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+      get().fetchProducts();
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+  },
+
+  removeProduct: async (id: string) => {
+    try {
+      const { error } = await supabase()
+        .from('products')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      get().fetchProducts();
+    } catch (error) {
+      console.error('Error removing product:', error);
+    }
+  },
+
+  addToShoppingList: async (item) => {
+    try {
+      const { error } = await supabase()
+        .from('shopping_list')
+        .insert([item]);
+      if (error) throw error;
+      get().fetchShoppingList();
+    } catch (error) {
+      console.error('Error adding to shopping list:', error);
+    }
+  },
+
+  removeFromShoppingList: async (id: string) => {
+    try {
+      const { error } = await supabase()
+        .from('shopping_list')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      get().fetchShoppingList();
+    } catch (error) {
+      console.error('Error removing from shopping list:', error);
+    }
+  },
+
+  updateShoppingItem: async (id: string, updates: Partial<ShoppingListItem>) => {
+    try {
+      const { error } = await supabase()
+        .from('shopping_list')
+        .update(updates)
+        .eq('id', id);
+      if (error) throw error;
+      get().fetchShoppingList();
+    } catch (error) {
+      console.error('Error updating shopping item:', error);
+    }
+  },
+
+  setSelectedCategory: (category) => set({ selectedCategory: category }),
+  setSearchQuery: (query) => set({ searchQuery: query }),
+
+  getFilteredProducts: () => {
+    const { products, selectedCategory, searchQuery } = get();
+    return products.filter((product) => {
+      const matchesCategory = !selectedCategory || product.category === selectedCategory;
+      const matchesSearch = !searchQuery || 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  },
+}));

@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { Product, ShoppingListItem } from "../types";
 import { supabase } from "../config/supabase/client";
@@ -26,8 +27,6 @@ interface ProductStore {
   getFilteredProducts: () => Product[];
   fetchShoppingList: () => Promise<void>;
 }
-
-export const { updateProduct, removeProduct, addToShoppingList } = useStore.getState();
 
 export const useStore = create<ProductStore>((set, get) => ({
   products: [],
@@ -72,7 +71,6 @@ export const useStore = create<ProductStore>((set, get) => ({
         .single();
 
       if (existing) {
-        // Met à jour la quantité si l'article existe déjà
         const { error } = await supabase()
           .from("shopping_list")
           .update({ quantity: item.quantity })
@@ -80,7 +78,6 @@ export const useStore = create<ProductStore>((set, get) => ({
 
         if (error) throw error;
       } else {
-        // Insère un nouvel article
         const { error } = await supabase()
           .from("shopping_list")
           .insert([{
@@ -190,9 +187,7 @@ export const useStore = create<ProductStore>((set, get) => ({
       const query = searchQuery.toLowerCase();
       const name = product.name.toLowerCase();
 
-      // Vérifie si le nom commence par la recherche
       const startsWithMatch = name.startsWith(query);
-      // Vérifie si le nom contient les mots de la recherche
       const containsMatch = query
         .split(" ")
         .every((word) => name.includes(word.toLowerCase()));
@@ -216,3 +211,5 @@ export const useStore = create<ProductStore>((set, get) => ({
     ];
   },
 }));
+
+export const { updateProduct, removeProduct, addToShoppingList } = useStore.getState();

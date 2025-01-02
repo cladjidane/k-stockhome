@@ -184,17 +184,17 @@ export default function ProductItem({
                           <button
                             key={location}
                             onClick={() => {
-                              const currentLocations = Array.isArray(product.location)
-                                ? product.location
-                                : [product.location];
+                              const currentLocation = product.location || '';
+                              const locationArray = currentLocation.split(',').map(l => l.trim()).filter(Boolean);
                               
-                              const updatedLocations = currentLocations.includes(location)
-                                ? currentLocations.filter(loc => loc !== location)
-                                : [...new Set([...currentLocations, location])];
-
-                              if (updatedLocations.length > 0) {
-                                onUpdateLocation(product.id, updatedLocations.join(","));
+                              if (locationArray.includes(location)) {
+                                const newLocations = locationArray.filter(l => l !== location);
+                                onUpdateLocation(product.id, newLocations.join(','));
+                              } else {
+                                const newLocations = [...locationArray, location];
+                                onUpdateLocation(product.id, newLocations.join(','));
                               }
+                              setShowLocations(false);
                             }}
                             className={`w-full text-left px-4 py-2 text-sm ${
                               isSelected

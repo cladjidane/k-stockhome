@@ -6,6 +6,7 @@ import { groupProductsByCategory } from "../../../utils/categoryUtils";
 import AnimatedTransition from "../../../shared/components/AnimatedTransition";
 import CategoryGroup from "../../../components/CategoryGroup";
 import { availableLocations } from "../../../utils/productUtils";
+import SearchBar from "../../../components/SearchBar";
 
 interface ProductListProps {
   products: Product[];

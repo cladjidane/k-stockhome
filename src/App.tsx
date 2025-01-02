@@ -23,6 +23,7 @@ import {
   updateShoppingItem,
 } from "./store/productStore";
 import ProductItem from "./features/products/components/ProductItem";
+import SearchBar from "./components/SearchBar";
 
 function App() {
   const {

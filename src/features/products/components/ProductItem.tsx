@@ -3,10 +3,10 @@ import {
   ChevronUp,
   Trash2,
   Award,
-  PenLine,
+  Pen,
   AlertTriangle,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tooltip } from "../../../shared";
 import { Product } from "../../../types";
 import { useStore } from "../../../store/productStore";
@@ -166,7 +166,7 @@ export default function ProductItem({
                     onClick={() => setShowLocations(!showLocations)}
                     className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
                   >
-                    <PenLine className="w-4 h-4" />
+                    <Pen className="w-4 h-4" />
                   </button>
                 </div>
 

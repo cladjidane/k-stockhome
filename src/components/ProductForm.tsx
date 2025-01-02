@@ -33,14 +33,14 @@ export default function ProductForm({ onAdd, products, onUpdateQuantity }: Produ
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center h-[70vh]">
       <button
         type="button"
         onClick={() => setShowScanner(true)}
-        className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        className="flex flex-col items-center justify-center p-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all"
       >
-        <Camera className="w-5 h-5 mr-2" />
-        Scanner un produit
+        <Camera className="w-16 h-16 mb-4" />
+        <span className="text-lg font-medium">Scanner un produit</span>
       </button>
 
       {showScanner && (

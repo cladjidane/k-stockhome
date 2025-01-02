@@ -1,9 +1,9 @@
+
 import {
   ChevronDown,
   ChevronUp,
   Trash2,
   Award,
-  Pen,
   AlertTriangle,
 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
@@ -21,10 +21,7 @@ interface ProductItemProps {
 
 const LOW_STOCK_THRESHOLD = 2;
 
-const locationColors: Record<
-  string,
-  { bg: string; text: string; icon: string }
-> = {
+const locationColors: Record<string, { bg: string; text: string; icon: string }> = {
   "Placard cuisine": { bg: "bg-amber-50", text: "text-amber-700", icon: "🪟" },
   Réfrigérateur: { bg: "bg-blue-50", text: "text-blue-700", icon: "❄️" },
   Congélateur: { bg: "bg-indigo-50", text: "text-indigo-700", icon: "🧊" },
@@ -49,22 +46,17 @@ export default function ProductItem({
   const [showLocations, setShowLocations] = useState(false);
   const [showLowStockAlert, setShowLowStockAlert] = useState(false);
   const locationMenuRef = useRef<HTMLDivElement>(null);
+  const { addToShoppingList } = useStore();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (
-        locationMenuRef.current &&
-        !locationMenuRef.current.contains(event.target as Node)
-      ) {
+      if (locationMenuRef.current && !locationMenuRef.current.contains(event.target as Node)) {
         setShowLocations(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  const locationStyle =
-    locationColors[product.location] || defaultLocationStyle;
-  const { addToShoppingList } = useStore();
 
   useEffect(() => {
     setShowLowStockAlert(product.quantity <= LOW_STOCK_THRESHOLD);
@@ -78,8 +70,7 @@ export default function ProductItem({
       unit: product.unit,
     });
     const toast = document.createElement("div");
-    toast.className =
-      "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500";
+    toast.className = "fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-500";
     toast.textContent = "Produit ajouté au panier";
     document.body.appendChild(toast);
     setTimeout(() => {
@@ -107,16 +98,10 @@ export default function ProductItem({
     const bgColor = colors[product.nutriscore.toLowerCase()] || "bg-gray-500";
 
     return (
-      <Tooltip
-        content={
-          descriptions[product.nutriscore.toLowerCase()] || "Nutri-Score"
-        }
-      >
+      <Tooltip content={descriptions[product.nutriscore.toLowerCase()] || "Nutri-Score"}>
         <div className="flex items-center gap-1">
           <Award className="w-4 h-4 text-gray-500" />
-          <span
-            className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${bgColor}`}
-          >
+          <span className={`px-2 py-0.5 rounded-full text-white text-xs font-medium ${bgColor}`}>
             {product.nutriscore.toUpperCase()}
           </span>
         </div>
@@ -128,7 +113,7 @@ export default function ProductItem({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-visible transition-all duration-200 hover:shadow-md">
       <div className="p-4">
         <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3">
+          <div className="flex items-start justify-between mb-3">
             <h3 className="flex items-center text-lg font-medium text-gray-900 dark:text-white truncate">
               {showLowStockAlert && (
                 <Tooltip content="Stock bas - Ajouter au panier">
@@ -143,13 +128,12 @@ export default function ProductItem({
               {product.name}
             </h3>
           </div>
-            <div className="mt-1 space-y-2">
-              <div className="relative group" ref={locationMenuRef}>
-                <div className="flex flex-wrap gap-2">
-                  {(Array.isArray(product.location)
-                    ? product.location
-                    : [product.location]
-                  ).map((loc) => {
+
+          <div className="mt-1 space-y-2">
+            <div className="relative group" ref={locationMenuRef}>
+              <div className="flex flex-wrap gap-2">
+                {(Array.isArray(product.location) ? product.location : [product.location])
+                  .map((loc) => {
                     const style = locationColors[loc] || defaultLocationStyle;
                     return (
                       <div
@@ -162,67 +146,53 @@ export default function ProductItem({
                       </div>
                     );
                   })}
-                </div>
+              </div>
 
-                {showLocations && (
-                  <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                    <div className="py-1">
-                      {availableLocations.map((location) => {
-                        const style =
-                          locationColors[location] || defaultLocationStyle;
-                        const isSelected = Array.isArray(product.location)
-                          ? product.location.includes(location)
-                          : product.location === location;
+              {showLocations && (
+                <div className="absolute z-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                  <div className="py-1">
+                    {availableLocations.map((location) => {
+                      const style = locationColors[location] || defaultLocationStyle;
+                      const isSelected = Array.isArray(product.location)
+                        ? product.location.includes(location)
+                        : product.location === location;
 
-                        return (
-                          <button
-                            key={location}
-                            onClick={() => {
-                              const currentLocation = product.location || "";
-                              const locationArray = currentLocation
-                                .split(",")
-                                .map((l) => l.trim())
-                                .filter(Boolean);
+                      return (
+                        <button
+                          key={location}
+                          onClick={() => {
+                            const currentLocation = product.location || "";
+                            const locationArray = currentLocation
+                              .split(",")
+                              .map((l) => l.trim())
+                              .filter(Boolean);
 
-                              if (locationArray.includes(location)) {
-                                const newLocations = locationArray.filter(
-                                  (l) => l !== location,
-                                );
-                                onUpdateLocation(
-                                  product.id,
-                                  newLocations.join(","),
-                                );
-                              } else {
-                                const newLocations = [
-                                  ...locationArray,
-                                  location,
-                                ];
-                                onUpdateLocation(
-                                  product.id,
-                                  newLocations.join(","),
-                                );
-                              }
-                              setShowLocations(false);
-                            }}
-                            className={`w-full text-left px-4 py-2 text-sm ${
-                              isSelected
-                                ? `${style.bg} ${style.text}`
-                                : "text-gray-700 hover:bg-gray-100"
-                            }`}
-                          >
-                            <span className="mr-2">{style.icon}</span>
-                            {location}
-                            {isSelected && <span className="ml-2">✓</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
+                            if (locationArray.includes(location)) {
+                              const newLocations = locationArray.filter(
+                                (l) => l !== location
+                              );
+                              onUpdateLocation(product.id, newLocations.join(","));
+                            } else {
+                              const newLocations = [...locationArray, location];
+                              onUpdateLocation(product.id, newLocations.join(","));
+                            }
+                            setShowLocations(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm ${
+                            isSelected
+                              ? `${style.bg} ${style.text}`
+                              : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          <span className="mr-2">{style.icon}</span>
+                          {location}
+                          {isSelected && <span className="ml-2">✓</span>}
+                        </button>
+                      );
+                    })}
                   </div>
-                )}
-              </div>
-              <div className="inline-flex items-center px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
-                {product.quantity} {product.unit}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -246,19 +216,11 @@ export default function ProductItem({
               
               <div className="w-px h-6 bg-gray-200 dark:bg-gray-700"></div>
               
-              <Tooltip
-                content={
-                  isExpanded
-                    ? "Masquer les informations nutritionnelles"
-                    : "Voir les informations nutritionnelles"
-                }
-              >
+              <Tooltip content={isExpanded ? "Masquer les informations nutritionnelles" : "Voir les informations nutritionnelles"}>
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                  aria-label={
-                    isExpanded ? "Masquer les détails" : "Voir les détails"
-                  }
+                  aria-label={isExpanded ? "Masquer les détails" : "Voir les détails"}
                 >
                   {isExpanded ? (
                     <ChevronUp className="w-4 h-4" />
@@ -274,7 +236,7 @@ export default function ProductItem({
 
       {isExpanded && product.nutriments && (
         <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center gap-2 justify-center bg-neutral-100 p-1 rounded ">
+          <div className="flex items-center gap-2 justify-center bg-neutral-100 p-1 rounded">
             {renderNutriscore()}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 text-sm">

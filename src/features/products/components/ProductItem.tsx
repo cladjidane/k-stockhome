@@ -164,9 +164,11 @@ export default function ProductItem({
           <div className="mt-1 space-y-2">
             <div className="relative group" ref={locationMenuRef}>
               <div className="flex flex-wrap gap-2">
-                {(Array.isArray(product.location)
+                {(typeof product.location === 'string'
+                  ? [product.location]
+                  : Array.isArray(product.location)
                   ? product.location
-                  : [product.location]
+                  : []
                 ).map((loc) => {
                   const style = locationColors[loc] || defaultLocationStyle;
                   return (

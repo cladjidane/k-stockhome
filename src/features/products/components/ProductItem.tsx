@@ -127,23 +127,22 @@ export default function ProductItem({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-visible transition-all duration-200 hover:shadow-md">
       <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
-              <h3 className="flex items-center text-lg font-medium text-gray-900 dark:text-white truncate">
-                {showLowStockAlert && (
-                  <Tooltip content="Stock bas - Ajouter au panier">
-                    <button
-                      onClick={handleAddToShoppingList}
-                      className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors shadow-sm"
-                    >
-                      <AlertTriangle className="w-4 h-4" />
-                    </button>
-                  </Tooltip>
-                )}
-                {product.name}
-              </h3>
-            </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3">
+            <h3 className="flex items-center text-lg font-medium text-gray-900 dark:text-white truncate">
+              {showLowStockAlert && (
+                <Tooltip content="Stock bas - Ajouter au panier">
+                  <button
+                    onClick={handleAddToShoppingList}
+                    className="p-2 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 text-amber-600 dark:text-amber-400 rounded-full transition-colors shadow-sm mr-2"
+                  >
+                    <AlertTriangle className="w-4 h-4" />
+                  </button>
+                </Tooltip>
+              )}
+              {product.name}
+            </h3>
+          </div>
             <div className="mt-1 space-y-2">
               <div className="relative group" ref={locationMenuRef}>
                 <div className="flex flex-wrap gap-2">
@@ -227,40 +226,48 @@ export default function ProductItem({
             </div>
           </div>
 
-          <div className="flex items-start">
-            <Tooltip content="Supprimer le produit">
-              <div className="relative">
+          <div className="mt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-4">
+            <div className="flex items-center space-x-2">
+              <div className="inline-flex items-center px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md text-sm">
+                {product.quantity} {product.unit}
+              </div>
+              {renderNutriscore()}
+            </div>
+            
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 rounded-lg p-1">
+              <Tooltip content="Supprimer le produit">
                 <button
                   onClick={() => onDelete(product.id)}
-                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
+                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-4 h-4" />
                 </button>
-              </div>
-            </Tooltip>
-            <Tooltip
-              content={
-                isExpanded
-                  ? "Masquer les informations nutritionnelles"
-                  : "Voir les informations nutritionnelles"
-              }
-            >
-              <div className="relative">
+              </Tooltip>
+              
+              <div className="w-px h-6 bg-gray-200 dark:bg-gray-700"></div>
+              
+              <Tooltip
+                content={
+                  isExpanded
+                    ? "Masquer les informations nutritionnelles"
+                    : "Voir les informations nutritionnelles"
+                }
+              >
                 <button
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
+                  className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   aria-label={
                     isExpanded ? "Masquer les détails" : "Voir les détails"
                   }
                 >
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5" />
+                    <ChevronUp className="w-4 h-4" />
                   ) : (
-                    <ChevronDown className="w-5 h-5" />
+                    <ChevronDown className="w-4 h-4" />
                   )}
                 </button>
-              </div>
-            </Tooltip>
+              </Tooltip>
+            </div>
           </div>
         </div>
       </div>

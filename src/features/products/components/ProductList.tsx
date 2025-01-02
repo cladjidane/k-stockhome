@@ -7,6 +7,7 @@ import AnimatedTransition from "../../../shared/components/AnimatedTransition";
 import CategoryGroup from "../../../components/CategoryGroup";
 import { availableLocations } from "../../../utils/productUtils";
 import SearchBar from "../../../components/SearchBar";
+import { useStore } from "../../../store/productStore";
 
 interface ProductListProps {
   products: Product[];

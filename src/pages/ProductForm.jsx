@@ -89,20 +89,18 @@ export default function ProductForm() {
     setIsLoading(true);
 
     try {
+      if (!formData.category || !formData.subCategory || formData.barcodes.length === 0) {
+        throw new Error('Les champs rayon, categorie et au moins un code-barres sont obligatoires');
+      }
+
       const productData = {
-        category: {
-          connect: { id: formData.category }
-        },
-        subCategory: formData.subCategory ? {
-          connect: { id: formData.subCategory }
-        } : undefined,
-        brand: formData.brand ? {
-          connect: { id: formData.brand }
-        } : undefined,
+        rayon: formData.rayon || 'Default',  // Adding the required rayon field
+        categoryId: formData.category,
+        subCategoryId: formData.subCategory,
+        brandId: formData.brand || undefined,
         quantite: parseInt(formData.quantite, 10),
         conditionnement: formData.conditionnement,
         barcodes: {
-          deleteMany: {},
           create: formData.barcodes.map(code => ({ code }))
         }
       };
@@ -115,8 +113,7 @@ export default function ProductForm() {
       navigate('/products');
     } catch (error) {
       console.error('Error saving product:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Une erreur est survenue lors de l\'enregistrement du produit';
-      setError(errorMessage);
+      setError(error.message || 'Une erreur est survenue lors de l\'enregistrement du produit');
     } finally {
       setIsLoading(false);
     }
@@ -143,24 +140,17 @@ export default function ProductForm() {
     try {
       let newEntity;
       switch (selectType) {
-        case 'rayon':
+        case 'category':
           newEntity = await productService.createCategory(inputValue);
           break;
-        case 'categorie':
-          if (!formData.rayon) {
-            setError('Veuillez d\'abord sélectionner un rayon');
-            return;
-          }
-          newEntity = await productService.createCategory(inputValue);
-          break;
-        case 'sousCategorie':
-          if (!formData.categorie) {
+        case 'subCategory':
+          if (!formData.category) {
             setError('Veuillez d\'abord sélectionner une catégorie');
             return;
           }
           newEntity = await productService.createSubCategory(inputValue);
           break;
-        case 'marque':
+        case 'brand':
           newEntity = await productService.createBrand(inputValue);
           break;
         default:

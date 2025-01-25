@@ -177,28 +177,29 @@ app.get('/api/products/:id', async (req, res) => {
 // Créer un produit
 app.post('/api/products', async (req, res) => {
   try {
-    const { rayon, categorie, barcodes } = req.body
+    const { rayon, categoryId, subCategoryId, brandId, barcodes, conditionnement, quantite } = req.body
 
     // Validate required fields
-    if (!rayon || !categorie || !barcodes || !barcodes.length) {
+    if (!rayon || !categoryId || !barcodes?.create?.length) {
       return res.status(400).json({
-        error: 'Les champs rayon, categorie et au moins un code-barres sont obligatoires'
+        error: 'Les champs rayon, category et au moins un code-barres sont obligatoires'
       })
     }
 
     const product = await prisma.product.create({
       data: {
         rayon,
-        categorie,
-        sousCategorie: req.body.sousCategorie,
-        marque: req.body.marque,
-        conditionnement: req.body.conditionnement,
-        quantite: req.body.quantite || 0,
-        barcodes: {
-          create: barcodes.map(code => ({ code }))
-        }
+        categoryId,
+        subCategoryId: subCategoryId || null,
+        brandId: brandId || null,
+        conditionnement,
+        quantite: quantite || 0,
+        barcodes: barcodes
       },
       include: {
+        category: true,
+        subCategory: true,
+        brand: true,
         barcodes: true
       }
     })
@@ -215,18 +216,18 @@ app.post('/api/products', async (req, res) => {
 // Mettre à jour un produit
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const productData = req.body;
+  const { rayon, category, subCategory, brand, barcodes, conditionnement, quantite } = req.body;
 
   try {
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
-        category: productData.category,
-        subCategory: productData.subCategory,
-        brand: productData.brand,
-        quantite: productData.quantite,
-        conditionnement: productData.conditionnement,
-        barcodes: productData.barcodes
+        rayon,
+        categoryId: category,
+        subCategoryId: subCategory || null,
+        brandId: brand || null,
+        quantite,
+        conditionnement
       },
       include: {
         category: true,

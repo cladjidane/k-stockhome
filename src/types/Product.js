@@ -35,6 +35,7 @@ export const SUBCATEGORIES = {
   }
 }
 
+
 export const PRODUCT_VARIANTS = {
   // Types spécifiques
   TUBE: 'Tube',
@@ -96,10 +97,11 @@ export const BRANDS = {
 
 export const DEFAULT_PRODUCT = {
   rayon: PRODUCT_CATEGORIES.SALLE_DE_BAIN,
-  categorie: '',
-  sousCategorie: '',
-  marque: '',
+  category: '',
+  subCategory: '',
+  brand: '',
   conditionnement: '',
   quantite: 0,
+  barcodes: [],
   codebar: ''
 }

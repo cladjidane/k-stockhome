@@ -1,4 +1,4 @@
-const API_URL = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}/api`
+const API_URL = window.location.hostname === 'localhost' ? '/api' : `${window.location.protocol}//${window.location.hostname}/api`
 
 export const api = {
   async get(endpoint) {

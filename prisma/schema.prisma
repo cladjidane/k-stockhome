@@ -37,9 +37,18 @@ model Brand {
   updatedAt   DateTime      @updatedAt
 }
 
+model Rayon {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  products    Product[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
 model Product {
   id              String       @id @default(uuid())
-  rayon           String
+  rayon           Rayon        @relation(fields: [rayonId], references: [id])
+  rayonId         String
   category        Category     @relation(fields: [categoryId], references: [id])
   categoryId      String
   subCategory     SubCategory? @relation(fields: [subCategoryId], references: [id])
@@ -51,19 +60,14 @@ model Product {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   barcodes        Barcode[]
-
-  @@index([rayon])
-  @@index([categoryId])
-  @@index([subCategoryId])
-  @@index([brandId])
 }
 
 model Barcode {
-  id        String   @id @default(uuid())
-  code      String   @unique
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-  createdAt DateTime @default(now())
+  id          String    @id @default(uuid())
+  code        String    @unique
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId   String
+  createdAt   DateTime  @default(now())
 
   @@index([code])
   @@index([productId])

@@ -52,7 +52,7 @@ export default function ProductItem({ product: initialProduct, onDelete }) {
         <div className="flex-1">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-medium text-gray-900">
-              {product.category?.name || 'Sans catégorie'}
+              {product.rayon?.name || 'Sans rayon'}
             </h3>
             <div className="flex items-center space-x-1">
               <button

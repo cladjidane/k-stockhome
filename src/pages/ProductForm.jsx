@@ -12,6 +12,7 @@ export default function ProductForm() {
   const location = useLocation()
   const [isScanning, setIsScanning] = useState(false);
   const [categoryOptions, setCategoryOptions] = useState({
+    rayon: [],
     category: [],
     subCategory: [],
     brand: []
@@ -20,13 +21,15 @@ export default function ProductForm() {
   useEffect(() => {
     const loadOptions = async () => {
       try {
-        const [categories, subCategories, brands] = await Promise.all([
+        const [rayons, categories, subCategories, brands] = await Promise.all([
+          productService.getRayons(),
           productService.getCategories(),
           productService.getSubCategories(),
           productService.getBrands()
         ])
 
         setCategoryOptions({
+          rayon: rayons.map(rayon => ({ value: rayon.id, label: rayon.name })),
           category: categories.map(cat => ({ value: cat.id, label: cat.name })),
           subCategory: subCategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
           brand: brands.map(brand => ({ value: brand.id, label: brand.name }))
@@ -39,6 +42,7 @@ export default function ProductForm() {
 
     loadOptions()
   }, [])
+
   const [formData, setFormData] = useState(() => {
     if (location.state?.codebar) {
       return { ...DEFAULT_PRODUCT, barcodes: [location.state.codebar] }
@@ -53,10 +57,11 @@ export default function ProductForm() {
       if (id) {
         try {
           setIsLoading(true);
-          const { product, categories, subcategories, brands } = await productService.getProduct(id);
+          const { product, categories, subcategories, brands, rayons } = await productService.getProduct(id);
           if (product) {
             setFormData({
               ...product,
+              rayon: product.rayon?.id || '',
               category: product.category?.id || '',
               subCategory: product.subCategory?.id || '',
               brand: product.brand?.id || '',
@@ -66,6 +71,7 @@ export default function ProductForm() {
             });
 
             setCategoryOptions({
+              rayon: rayons.map(rayon => ({ value: rayon.id, label: rayon.name })),
               category: categories.map(cat => ({ value: cat.id, label: cat.name })),
               subCategory: subcategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
               brand: brands.map(brand => ({ value: brand.id, label: brand.name }))
@@ -89,14 +95,14 @@ export default function ProductForm() {
     setIsLoading(true);
 
     try {
-      if (!formData.category || !formData.subCategory || formData.barcodes.length === 0) {
+      if (!formData.rayon || !formData.category || formData.barcodes.length === 0) {
         throw new Error('Les champs rayon, categorie et au moins un code-barres sont obligatoires');
       }
 
       const productData = {
-        rayon: formData.rayon || 'Default',  // Adding the required rayon field
+        rayonId: formData.rayon,
         categoryId: formData.category,
-        subCategoryId: formData.subCategory,
+        subCategoryId: formData.subCategory || undefined,
         brandId: formData.brand || undefined,
         quantite: parseInt(formData.quantite, 10),
         conditionnement: formData.conditionnement,
@@ -140,6 +146,9 @@ export default function ProductForm() {
     try {
       let newEntity;
       switch (selectType) {
+        case 'rayon':
+          newEntity = await productService.createRayon(inputValue);
+          break;
         case 'category':
           newEntity = await productService.createCategory(inputValue);
           break;
@@ -168,11 +177,6 @@ export default function ProductForm() {
       setError(`Erreur lors de la création de l'option: ${error.message}`);
     }
   };
-
-  // Filter subcategories based on selected category
-  const filteredSubCategories = formData.category
-    ? categoryOptions.subCategory.filter(subCat => subCat.parentId === formData.category)
-    : categoryOptions.subCategory;
 
   if (isLoading) {
     return (
@@ -259,6 +263,30 @@ export default function ProductForm() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                    <div className="sm:col-span-1">
+                      <label htmlFor="rayon" className="block text-sm font-medium leading-6 text-gray-900">
+                        Rayon
+                      </label>
+                      <div className="mt-2">
+                        <Select
+                          id="rayon"
+                          name="rayon"
+                          value={categoryOptions.rayon.find(option => option.value === formData.rayon)}
+                          onChange={(newValue) => {
+                            setFormData(prev => ({ ...prev, rayon: newValue ? newValue.value : '' }));
+                          }}
+                          options={categoryOptions.rayon}
+                          styles={customStyles}
+                          placeholder="Sélectionner un rayon"
+                          isClearable
+                          isSearchable
+                          required
+                          creatable
+                          onCreateOption={(inputValue) => handleCreateOption(inputValue, 'rayon')}
+                        />
+                      </div>
+                    </div>
+
                     <div className="sm:col-span-1">
                       <label htmlFor="category" className="block text-sm font-medium leading-6 text-gray-900">
                         Catégorie

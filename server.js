@@ -14,6 +14,38 @@ app.use(cors({
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
+// Rayon endpoints
+app.get('/api/rayons', async (req, res) => {
+  try {
+    const rayons = await prisma.rayon.findMany({
+      orderBy: { name: 'asc' }
+    })
+    res.json(rayons)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error retrieving rayons' })
+  }
+})
+
+app.post('/api/rayons', async (req, res) => {
+  try {
+    const { name } = req.body
+    if (!name) {
+      return res.status(400).json({ error: 'Rayon name is required' })
+    }
+    const rayon = await prisma.rayon.create({
+      data: { name }
+    })
+    res.status(201).json(rayon)
+  } catch (error) {
+    console.error(error)
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Rayon already exists' })
+    }
+    res.status(500).json({ error: 'Error creating rayon' })
+  }
+})
+
 // Category endpoints
 app.get('/api/categories', async (req, res) => {
   try {
@@ -121,6 +153,7 @@ app.get('/api/products', async (req, res) => {
         { category: { name: { contains: search } } },
         { subCategory: { name: { contains: search } } },
         { brand: { name: { contains: search } } },
+        { rayon: { name: { contains: search } } },
         { barcodes: { some: { code: { contains: search } } } },
       ]
     }
@@ -131,7 +164,8 @@ app.get('/api/products', async (req, res) => {
         barcodes: true,
         category: true,
         subCategory: true,
-        brand: true
+        brand: true,
+        rayon: true
       },
       orderBy: [
         { category: { name: 'asc' } }
@@ -148,19 +182,21 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const [product, categories, subcategories, brands] = await Promise.all([
+    const [product, categories, subcategories, brands, rayons] = await Promise.all([
       prisma.product.findUnique({
         where: { id },
         include: {
           category: true,
           subCategory: true,
           brand: true,
+          rayon: true,
           barcodes: true
         }
       }),
       prisma.category.findMany({ orderBy: { name: 'asc' } }),
       prisma.subCategory.findMany({ orderBy: { name: 'asc' } }),
-      prisma.brand.findMany({ orderBy: { name: 'asc' } })
+      prisma.brand.findMany({ orderBy: { name: 'asc' } }),
+      prisma.rayon.findMany({ orderBy: { name: 'asc' } })
     ])
 
     if (!product) {
@@ -171,7 +207,8 @@ app.get('/api/products/:id', async (req, res) => {
       product,
       categories,
       subcategories,
-      brands
+      brands,
+      rayons
     })
   } catch (error) {
     console.error(error)
@@ -182,10 +219,10 @@ app.get('/api/products/:id', async (req, res) => {
 // Créer un produit
 app.post('/api/products', async (req, res) => {
   try {
-    const { rayon, categoryId, subCategoryId, brandId, barcodes, conditionnement, quantite } = req.body
+    const { rayonId, categoryId, subCategoryId, brandId, barcodes, conditionnement, quantite } = req.body
 
     // Validate required fields
-    if (!rayon || !categoryId || !barcodes?.create?.length) {
+    if (!rayonId || !categoryId || !barcodes?.create?.length) {
       return res.status(400).json({
         error: 'Les champs rayon, category et au moins un code-barres sont obligatoires'
       })
@@ -193,7 +230,7 @@ app.post('/api/products', async (req, res) => {
 
     const product = await prisma.product.create({
       data: {
-        rayon,
+        rayonId,
         categoryId,
         subCategoryId: subCategoryId || null,
         brandId: brandId || null,
@@ -205,6 +242,7 @@ app.post('/api/products', async (req, res) => {
         category: true,
         subCategory: true,
         brand: true,
+        rayon: true,
         barcodes: true
       }
     })
@@ -221,16 +259,16 @@ app.post('/api/products', async (req, res) => {
 // Mettre à jour un produit
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const { rayon, category, subCategory, brand, barcodes, conditionnement, quantite } = req.body;
+  const { rayonId, categoryId, subCategoryId, brandId, conditionnement, quantite } = req.body;
 
   try {
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
-        rayon,
-        categoryId: category,
-        subCategoryId: subCategory || null,
-        brandId: brand || null,
+        rayonId,
+        categoryId,
+        subCategoryId: subCategoryId || null,
+        brandId: brandId || null,
         quantite,
         conditionnement
       },
@@ -238,6 +276,7 @@ app.put('/api/products/:id', async (req, res) => {
         category: true,
         subCategory: true,
         brand: true,
+        rayon: true,
         barcodes: true
       }
     });
@@ -248,79 +287,6 @@ app.put('/api/products/:id', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// Vérifier si un code-barres existe
-app.get('/api/products/check-barcode/:code', async (req, res) => {
-  try {
-    const { code } = req.params
-    const { excludeProductId } = req.query
-    
-    const barcode = await prisma.barcode.findFirst({
-      where: {
-        code,
-        ...(excludeProductId && {
-          productId: { not: excludeProductId }
-        })
-      },
-      include: {
-        product: true
-      }
-    })
-    res.json({ exists: !!barcode, product: barcode?.product })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Erreur lors de la vérification du code-barres' })
-  }
-})
-
-// Ajouter un code-barres à un produit
-app.post('/api/products/:id/barcodes', async (req, res) => {
-  try {
-    const { id } = req.params
-    const { code } = req.body
-
-    if (!code) {
-      return res.status(400).json({ error: 'Le code-barres est obligatoire' })
-    }
-
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        barcodes: {
-          create: { code }
-        }
-      },
-      include: {
-        barcodes: true
-      }
-    })
-    res.json(product)
-  } catch (error) {
-    console.error(error)
-    if (error.code === 'P2002') {
-      return res.status(400).json({ error: 'Ce code-barres existe déjà' })
-    }
-    res.status(500).json({ error: 'Erreur lors de l\'ajout du code-barres' })
-  }
-})
-
-// Supprimer un code-barres d'un produit
-app.delete('/api/products/:productId/barcodes/:code', async (req, res) => {
-  try {
-    const { productId, code } = req.params
-
-    await prisma.barcode.deleteMany({
-      where: {
-        productId,
-        code
-      }
-    })
-    res.json({ success: true })
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Erreur lors de la suppression du code-barres' })
-  }
-})
 
 // Delete a product
 app.delete('/api/products/:id', async (req, res) => {

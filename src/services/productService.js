@@ -1,6 +1,15 @@
 import { api } from './api'
 
 export const productService = {
+  // Rayon operations
+  getRayons: async () => {
+    return api.get('/rayons')
+  },
+
+  createRayon: async (name) => {
+    return api.post('/rayons', { name })
+  },
+
   // Category operations
   getCategories: async () => {
     return api.get('/categories')

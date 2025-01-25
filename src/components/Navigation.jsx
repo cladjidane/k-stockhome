@@ -3,7 +3,7 @@ import { HomeIcon, PlusIcon, QueueListIcon } from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'Accueil', href: '/', icon: HomeIcon },
-  { name: 'Ajouter', href: '/products/new', icon: PlusIcon },
+  { name: 'Ajouter', href: '/add-stock', icon: PlusIcon },
   { name: 'Produits', href: '/products', icon: QueueListIcon },
 ]
 

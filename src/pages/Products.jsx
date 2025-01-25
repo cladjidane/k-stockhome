@@ -1,8 +1,38 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PlusIcon } from '@heroicons/react/24/outline';
+import { productService } from '../services/productService';
 
 export default function Products() {
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        const data = await productService.getProducts({});
+        setProducts(data);
+      } catch (err) {
+        setError('Error loading products');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow">
@@ -36,16 +66,19 @@ export default function Products() {
                       <thead>
                         <tr>
                           <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
-                            Name
+                            Brand
+                          </th>
+                          <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                            Department
                           </th>
                           <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                             Category
                           </th>
                           <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                            Stock
+                            Quantity
                           </th>
                           <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                            Last Updated
+                            Packaging
                           </th>
                           <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                             <span className="sr-only">Actions</span>
@@ -53,16 +86,41 @@ export default function Products() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        <tr>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                            No products yet
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                          <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                          </td>
-                        </tr>
+                        {products.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 text-center">
+                              No products yet
+                            </td>
+                          </tr>
+                        ) : (
+                          products.map((product) => (
+                            <tr key={product.id}>
+                              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                                {product.marque || '-'}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {product.rayon}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {product.categorie}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {product.quantite}
+                              </td>
+                              <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {product.conditionnement || '-'}
+                              </td>
+                              <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                                <Link
+                                  to={`/products/${product.id}`}
+                                  className="text-indigo-600 hover:text-indigo-900"
+                                >
+                                  Edit
+                                </Link>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>

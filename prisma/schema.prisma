@@ -18,7 +18,7 @@ model Product {
   rayon           String
   categorie       String
   sousCategorie   String?
-  marque          String
+  marque          String?
   conditionnement String?
   quantite        Int      @default(0)
   codebar         String

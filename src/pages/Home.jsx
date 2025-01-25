@@ -6,7 +6,7 @@ const actions = [
   {
     name: 'Ajouter un produit',
     description: 'Créer un nouveau produit dans votre inventaire',
-    href: '/products/new',
+    href: '/add-stock',
     icon: PlusIcon,
     bgColor: 'bg-indigo-600',
   },

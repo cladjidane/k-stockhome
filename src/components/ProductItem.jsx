@@ -27,7 +27,7 @@ export default function ProductItem({ product: initialProduct }) {
       <div className="flex-1">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-base font-medium text-gray-900">
-            {product.marque}
+            {product.marque || 'Sans marque'}
           </h3>
           <div className="flex items-center space-x-1">
             <button
@@ -58,12 +58,16 @@ export default function ProductItem({ product: initialProduct }) {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700">
-            {product.rayon}
-          </span>
-          <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-700">
-            {product.categorie}
-          </span>
+          {product.rayon && (
+            <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700">
+              {product.rayon}
+            </span>
+          )}
+          {product.categorie && (
+            <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-sm font-medium text-indigo-700">
+              {product.categorie}
+            </span>
+          )}
           {product.sousCategorie && (
             <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-sm font-medium text-purple-700">
               {product.sousCategorie}
@@ -71,8 +75,8 @@ export default function ProductItem({ product: initialProduct }) {
           )}
         </div>
         <div className="mt-4 flex items-center space-x-3 text-sm text-gray-500">
-          <span>{product.conditionnement}</span>
-          <span className="font-mono text-xs text-gray-400">{product.codebar}</span>
+          {product.conditionnement && <span>{product.conditionnement}</span>}
+          {product.codebar && <span className="font-mono text-xs text-gray-400">{product.codebar}</span>}
         </div>
       </div>
     </div>

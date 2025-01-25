@@ -1,44 +1,20 @@
 import React, { useState } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
-import { useEffect } from 'react';
+import { useZxing } from 'react-zxing';
 import { QrCodeIcon } from '@heroicons/react/24/outline';
 
 const BarcodeScanner = ({ onScanSuccess }) => {
-  const [scanner, setScanner] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const newScanner = new Html5QrcodeScanner('reader', {
-      qrbox: {
-        width: 250,
-        height: 250,
-      },
-      fps: 5,
-      rememberLastUsedCamera: true,
-      showTorchButtonIfSupported: true,
-    });
-
-    newScanner.render(success, error);
-    setScanner(newScanner);
-    setIsLoading(false);
-
-    return () => {
-      if (scanner) {
-        scanner.clear();
-      }
-    };
-  }, []);
-
-  const success = (result) => {
-    if (scanner) {
-      scanner.clear();
-    }
-    onScanSuccess(result);
-  };
-
-  const error = (err) => {
-    console.warn(err);
-  };
+  const { ref } = useZxing({
+    onDecodeResult(result) {
+      console.log('[BarcodeScanner] Scan successful:', { result: result.getText() });
+      onScanSuccess(result.getText());
+    },
+    onError(error) {
+      console.error('[BarcodeScanner] Scan error:', error);
+      setError('Unable to access camera: ' + error.message);
+    },
+  });
 
   return (
     <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
@@ -50,17 +26,23 @@ const BarcodeScanner = ({ onScanSuccess }) => {
       </div>
       
       <div className="p-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        {error ? (
+          <div className="text-center py-8">
+            <p className="text-red-600 text-sm">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Réessayer
+            </button>
           </div>
         ) : (
-          <>
-            <div id="reader" className="w-full"></div>
+          <div className="relative">
+            <video ref={ref} className="w-full h-64 object-cover" />
             <p className="mt-4 text-sm text-gray-500 text-center">
               Placez le code-barres dans le cadre pour le scanner
             </p>
-          </>
+          </div>
         )}
       </div>
     </div>

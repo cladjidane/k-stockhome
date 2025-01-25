@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom'
 import { ArrowLeftIcon, QrCodeIcon } from '@heroicons/react/24/outline'
 import BarcodeScanner from '../components/Scanner/BarcodeScanner'
 import { productService } from '../services/productService'
@@ -14,8 +14,14 @@ import {
 export default function ProductForm() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const [isScanning, setIsScanning] = useState(false)
-  const [formData, setFormData] = useState(DEFAULT_PRODUCT)
+  const [formData, setFormData] = useState(() => {
+    if (location.state?.codebar) {
+      return { ...DEFAULT_PRODUCT, codebar: location.state.codebar }
+    }
+    return DEFAULT_PRODUCT
+  })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -174,7 +180,7 @@ export default function ProductForm() {
                           onChange={(e) => setFormData(prev => ({ ...prev, categorie: e.target.value }))}
                         >
                           <option value="">Sélectionner une catégorie</option>
-                          {Object.values(SUBCATEGORIES).map((subcat) => (
+                          {Object.values(SUBCATEGORIES[formData.rayon] || {}).map((subcat) => (
                             <option key={subcat} value={subcat}>
                               {subcat}
                             </option>
@@ -213,7 +219,6 @@ export default function ProductForm() {
                         <select
                           id="marque"
                           name="marque"
-                          required
                           className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                           value={formData.marque}
                           onChange={(e) => setFormData(prev => ({ ...prev, marque: e.target.value }))}

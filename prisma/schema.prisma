@@ -13,18 +13,58 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model Product {
-  id              String   @id @default(uuid())
-  rayon           String
-  categorie       String
-  sousCategorie   String?
-  marque          String?
-  conditionnement String?
-  quantite        Int      @default(0)
-  codebar         String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+model Category {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  products    Product[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
 
-  @@index([codebar])
-  @@index([rayon, categorie])
+model SubCategory {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  products    Product[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Brand {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  products    Product[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Product {
+  id              String       @id @default(uuid())
+  rayon           String
+  category        Category     @relation(fields: [categoryId], references: [id])
+  categoryId      String
+  subCategory     SubCategory? @relation(fields: [subCategoryId], references: [id])
+  subCategoryId   String?
+  brand           Brand?       @relation(fields: [brandId], references: [id])
+  brandId         String?
+  conditionnement String?
+  quantite        Int          @default(0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  barcodes        Barcode[]
+
+  @@index([rayon])
+  @@index([categoryId])
+  @@index([subCategoryId])
+  @@index([brandId])
+}
+
+model Barcode {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([productId])
 }

@@ -1,26 +1,49 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom'
-import { ArrowLeftIcon, QrCodeIcon } from '@heroicons/react/24/outline'
+import { ArrowLeftIcon, QrCodeIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import BarcodeScanner from '../components/Scanner/BarcodeScanner'
 import { productService } from '../services/productService'
-import {
-  PRODUCT_CATEGORIES,
-  SUBCATEGORIES,
-  PRODUCT_VARIANTS,
-  BRANDS,
-  DEFAULT_PRODUCT
-} from '../types/Product'
+import Select from 'react-select/creatable'
+import { DEFAULT_PRODUCT } from '../types/Product'
 
 export default function ProductForm() {
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
-  const [isScanning, setIsScanning] = useState(false)
+  const [isScanning, setIsScanning] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState({
+    category: [],
+    subCategory: [],
+    brand: []
+  })
+
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [categories, subCategories, brands] = await Promise.all([
+          productService.getCategories(),
+          productService.getSubCategories(),
+          productService.getBrands()
+        ])
+
+        setCategoryOptions({
+          category: categories.map(cat => ({ value: cat.id, label: cat.name })),
+          subCategory: subCategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
+          brand: brands.map(brand => ({ value: brand.id, label: brand.name }))
+        })
+      } catch (error) {
+        console.error('Error loading options:', error)
+        setError('Error loading categories and brands')
+      }
+    }
+
+    loadOptions()
+  }, [])
   const [formData, setFormData] = useState(() => {
     if (location.state?.codebar) {
-      return { ...DEFAULT_PRODUCT, codebar: location.state.codebar }
+      return { ...DEFAULT_PRODUCT, barcodes: [location.state.codebar] }
     }
-    return DEFAULT_PRODUCT
+    return { ...DEFAULT_PRODUCT, barcodes: [] }
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -29,55 +52,137 @@ export default function ProductForm() {
     const loadProduct = async () => {
       if (id) {
         try {
-          setIsLoading(true)
-          const product = await productService.getProduct(id)
+          setIsLoading(true);
+          const { product, categories, subcategories, brands } = await productService.getProduct(id);
           if (product) {
-            setFormData(product)
+            setFormData({
+              ...product,
+              category: product.category?.id || '',
+              subCategory: product.subCategory?.id || '',
+              brand: product.brand?.id || '',
+              barcodes: product.barcodes?.map(b => b.code) || [],
+              quantite: product.quantite || 0,
+              conditionnement: product.conditionnement || ''
+            });
+
+            setCategoryOptions({
+              category: categories.map(cat => ({ value: cat.id, label: cat.name })),
+              subCategory: subcategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
+              brand: brands.map(brand => ({ value: brand.id, label: brand.name }))
+            });
           }
         } catch (err) {
-          setError('Erreur lors du chargement du produit')
-          console.error(err)
+          setError('Erreur lors du chargement du produit');
+          console.error(err);
         } finally {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
-    }
+    };
 
-    loadProduct()
-  }, [id])
+    loadProduct();
+  }, [id]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
     try {
-      // Vérifier si le code-barres existe déjà
-      const exists = await productService.checkBarcodeExists(formData.codebar, id)
-      if (exists) {
-        setError('Ce code-barres existe déjà')
-        setIsLoading(false)
-        return
-      }
+      const productData = {
+        category: {
+          connect: { id: formData.category }
+        },
+        subCategory: formData.subCategory ? {
+          connect: { id: formData.subCategory }
+        } : undefined,
+        brand: formData.brand ? {
+          connect: { id: formData.brand }
+        } : undefined,
+        quantite: parseInt(formData.quantite, 10),
+        conditionnement: formData.conditionnement,
+        barcodes: {
+          deleteMany: {},
+          create: formData.barcodes.map(code => ({ code }))
+        }
+      };
 
       if (id) {
-        await productService.updateProduct(id, formData)
+        await productService.updateProduct(id, productData);
       } else {
-        await productService.createProduct(formData)
+        await productService.createProduct(productData);
       }
-      navigate('/products')
-    } catch (err) {
-      setError('Erreur lors de la sauvegarde')
-      console.error(err)
+      navigate('/products');
+    } catch (error) {
+      console.error('Error saving product:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Une erreur est survenue lors de l\'enregistrement du produit';
+      setError(errorMessage);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleScan = (result) => {
-    setFormData(prev => ({ ...prev, codebar: result }))
+    if (!formData.barcodes.includes(result)) {
+      setFormData(prev => ({
+        ...prev,
+        barcodes: [...prev.barcodes, result]
+      }))
+    }
     setIsScanning(false)
   }
+
+  const removeBarcode = (barcode) => {
+    setFormData(prev => ({
+      ...prev,
+      barcodes: prev.barcodes.filter(code => code !== barcode)
+    }))
+  }
+
+  const handleCreateOption = async (inputValue, selectType) => {
+    try {
+      let newEntity;
+      switch (selectType) {
+        case 'rayon':
+          newEntity = await productService.createCategory(inputValue);
+          break;
+        case 'categorie':
+          if (!formData.rayon) {
+            setError('Veuillez d\'abord sélectionner un rayon');
+            return;
+          }
+          newEntity = await productService.createCategory(inputValue);
+          break;
+        case 'sousCategorie':
+          if (!formData.categorie) {
+            setError('Veuillez d\'abord sélectionner une catégorie');
+            return;
+          }
+          newEntity = await productService.createSubCategory(inputValue);
+          break;
+        case 'marque':
+          newEntity = await productService.createBrand(inputValue);
+          break;
+        default:
+          return;
+      }
+
+      const newOption = { value: newEntity.id, label: newEntity.name };
+      setCategoryOptions(prev => ({
+        ...prev,
+        [selectType]: [...prev[selectType], newOption]
+      }));
+      setFormData(prev => ({ ...prev, [selectType]: newOption.value }));
+    } catch (error) {
+      console.error('Error creating new option:', error);
+      setError(`Erreur lors de la création de l'option: ${error.message}`);
+    }
+  };
+
+  // Filter subcategories based on selected category
+  const filteredSubCategories = formData.category
+    ? categoryOptions.subCategory.filter(subCat => subCat.parentId === formData.category)
+    : categoryOptions.subCategory;
 
   if (isLoading) {
     return (
@@ -86,6 +191,27 @@ export default function ProductForm() {
       </div>
     )
   }
+
+  const customStyles = {
+    control: (base) => ({
+      ...base,
+      minHeight: '42px',
+      borderRadius: '0.375rem',
+      borderColor: 'transparent',
+      boxShadow: '0 0 0 1px rgb(209 213 219)',
+      '&:hover': {
+        borderColor: 'transparent',
+        boxShadow: '0 0 0 1px rgb(209 213 219)'
+      }
+    }),
+    option: (base, state) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#4F46E5' : state.isFocused ? '#EEF2FF' : 'white',
+      ':active': {
+        backgroundColor: '#4F46E5'
+      }
+    })
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -144,94 +270,77 @@ export default function ProductForm() {
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
                     <div className="sm:col-span-1">
-                      <label htmlFor="rayon" className="block text-sm font-medium leading-6 text-gray-900">
-                        Rayon
-                      </label>
-                      <div className="mt-2">
-                        <select
-                          id="rayon"
-                          name="rayon"
-                          required
-                          className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          value={formData.rayon}
-                          onChange={(e) => setFormData(prev => ({ ...prev, rayon: e.target.value }))}
-                        >
-                          <option value="">Sélectionner un rayon</option>
-                          {Object.values(PRODUCT_CATEGORIES).map((category) => (
-                            <option key={category} value={category}>
-                              {category}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="sm:col-span-1">
-                      <label htmlFor="categorie" className="block text-sm font-medium leading-6 text-gray-900">
+                      <label htmlFor="category" className="block text-sm font-medium leading-6 text-gray-900">
                         Catégorie
                       </label>
-                      <div className="mt-2">
-                        <select
-                          id="categorie"
-                          name="categorie"
+                      <div className="mt-2 relative">
+                        <Select
+                          id="category"
+                          name="category"
+                          value={categoryOptions.category.find(option => option.value === formData.category)}
+                          onChange={(newValue) => {
+                            setFormData(prev => ({ ...prev, category: newValue.value }));
+                          }}
+                          options={categoryOptions.category}
+                          styles={customStyles}
+                          placeholder="Sélectionner une catégorie"
+                          isClearable
+                          isSearchable
                           required
-                          className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          value={formData.categorie}
-                          onChange={(e) => setFormData(prev => ({ ...prev, categorie: e.target.value }))}
-                        >
-                          <option value="">Sélectionner une catégorie</option>
-                          {Object.values(SUBCATEGORIES[formData.rayon] || {}).map((subcat) => (
-                            <option key={subcat} value={subcat}>
-                              {subcat}
-                            </option>
-                          ))}
-                        </select>
+                          creatable
+                          onCreateOption={(inputValue) => handleCreateOption(inputValue, 'category')}
+                        />
                       </div>
                     </div>
 
                     <div className="sm:col-span-1">
-                      <label htmlFor="sousCategorie" className="block text-sm font-medium leading-6 text-gray-900">
+                      <label htmlFor="subCategory" className="block text-sm font-medium leading-6 text-gray-900">
                         Sous-catégorie
                       </label>
                       <div className="mt-2">
-                        <select
-                          id="sousCategorie"
-                          name="sousCategorie"
-                          className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          value={formData.sousCategorie}
-                          onChange={(e) => setFormData(prev => ({ ...prev, sousCategorie: e.target.value }))}
-                        >
-                          <option value="">Sélectionner une sous-catégorie</option>
-                          {Object.values(PRODUCT_VARIANTS).map((variant) => (
-                            <option key={variant} value={variant}>
-                              {variant}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          id="subCategory"
+                          name="subCategory"
+                          value={categoryOptions.subCategory.find(option => option.value === formData.subCategory)}
+                          onChange={(newValue) => {
+                            setFormData(prev => ({ ...prev, subCategory: newValue ? newValue.value : '' }));
+                          }}
+                          options={categoryOptions.subCategory}
+                          styles={customStyles}
+                          placeholder="Sélectionner une sous-catégorie"
+                          isClearable
+                          isSearchable
+                          isDisabled={!formData.category}
+                          creatable
+                          onCreateOption={(inputValue) => handleCreateOption(inputValue, 'subCategory')}
+                        />
                       </div>
                     </div>
 
                     <div className="sm:col-span-1">
-                      <label htmlFor="marque" className="block text-sm font-medium leading-6 text-gray-900">
+                      <label htmlFor="brand" className="block text-sm font-medium leading-6 text-gray-900">
                         Marque
                       </label>
                       <div className="mt-2">
-                        <select
-                          id="marque"
-                          name="marque"
-                          className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          value={formData.marque}
-                          onChange={(e) => setFormData(prev => ({ ...prev, marque: e.target.value }))}
-                        >
-                          <option value="">Sélectionner une marque</option>
-                          {Object.values(BRANDS).map((brand) => (
-                            <option key={brand} value={brand}>
-                              {brand}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          id="brand"
+                          name="brand"
+                          value={categoryOptions.brand.find(option => option.value === formData.brand)}
+                          onChange={(newValue) => {
+                            setFormData(prev => ({ ...prev, brand: newValue ? newValue.value : '' }));
+                          }}
+                          options={categoryOptions.brand}
+                          styles={customStyles}
+                          placeholder="Sélectionner une marque"
+                          isClearable
+                          isSearchable
+                          creatable
+                          onCreateOption={(inputValue) => handleCreateOption(inputValue, 'brand')}
+                        />
                       </div>
                     </div>
+
+
 
                     <div className="sm:col-span-1">
                       <label htmlFor="conditionnement" className="block text-sm font-medium leading-6 text-gray-900">
@@ -269,26 +378,34 @@ export default function ProductForm() {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label htmlFor="codebar" className="block text-sm font-medium leading-6 text-gray-900">
-                        Code-barres
+                      <label className="block text-sm font-medium leading-6 text-gray-900">
+                        Codes-barres
                       </label>
-                      <div className="mt-2 flex rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="codebar"
-                          id="codebar"
-                          required
-                          className="block w-full rounded-none rounded-l-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                          value={formData.codebar}
-                          onChange={(e) => setFormData(prev => ({ ...prev, codebar: e.target.value }))}
-                        />
+                      <div className="mt-2">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {formData.barcodes.map((barcode) => (
+                            <span
+                              key={barcode}
+                              className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200"
+                            >
+                              {barcode}
+                              <button
+                                type="button"
+                                onClick={() => removeBarcode(barcode)}
+                                className="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-gray-500/20"
+                              >
+                                <XMarkIcon className="h-3.5 w-3.5 text-gray-400 group-hover:text-gray-500" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
                         <button
                           type="button"
                           onClick={() => setIsScanning(true)}
-                          className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2.5 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                          className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                         >
-                          <QrCodeIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                          Scanner
+                          <QrCodeIcon className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                          Scanner un code-barres
                         </button>
                       </div>
                     </div>

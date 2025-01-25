@@ -2,11 +2,19 @@ const API_URL = 'http://localhost:3000/api'
 
 export const api = {
   async get(endpoint) {
-    const response = await fetch(`${API_URL}${endpoint}`)
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+      return response.json()
+    } catch (error) {
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        throw new Error('Unable to connect to the server. Please check your connection and try again.')
+      }
+      throw error
     }
-    return response.json()
   },
 
   async post(endpoint, data) {
@@ -18,7 +26,8 @@ export const api = {
       body: JSON.stringify(data),
     })
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorData = await response.json()
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
     return response.json()
   },
@@ -32,7 +41,22 @@ export const api = {
       body: JSON.stringify(data),
     })
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorData = await response.json()
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+    }
+    return response.json()
+  },
+
+  async delete(endpoint) {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
     }
     return response.json()
   }

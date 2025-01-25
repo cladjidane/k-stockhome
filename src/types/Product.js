@@ -6,32 +6,33 @@ export const PRODUCT_CATEGORIES = {
 }
 
 export const SUBCATEGORIES = {
-  // Salle de bain
-  GEL_DOUCHE: 'Gel douche',
-  DENTIFRICE: 'Dentifrice',
-  SHAMPOOING: 'Shampoing',
-  PROTEGES_SLIPS: 'Protèges slips',
-  DEODORANT: 'Déodorant',
-  MASQUE: 'Masque',
-  BB_CREME: 'BB crème',
-  SERVIETTE: 'Serviette',
-  TAMPAX: 'Tampax',
-  BROSSE_A_DENT: 'Brosse à dent',
-  EAU_MICELLAIRE: 'Eau micellaire',
-  LAIT_DE_CORPS: 'Lait de corps',
-
-  // Linge
-  LESSIVE: 'Lessive',
-
-  // Cuisine
-  LAVE_VAISSELLE: 'Lave vaisselle',
-  PRODUIT_VAISSELLE: 'Produit vaisselle',
-
-  // Nettoyage
-  SPRAY: 'Spray',
-  CLIP_WC: 'Clip wc',
-  EPONGE: 'Eponge',
-  SAC_POUBELLE: 'Sac poubelle'
+  [PRODUCT_CATEGORIES.SALLE_DE_BAIN]: {
+    GEL_DOUCHE: 'Gel douche',
+    DENTIFRICE: 'Dentifrice',
+    SHAMPOOING: 'Shampoing',
+    PROTEGES_SLIPS: 'Protèges slips',
+    DEODORANT: 'Déodorant',
+    MASQUE: 'Masque',
+    BB_CREME: 'BB crème',
+    SERVIETTE: 'Serviette',
+    TAMPAX: 'Tampax',
+    BROSSE_A_DENT: 'Brosse à dent',
+    EAU_MICELLAIRE: 'Eau micellaire',
+    LAIT_DE_CORPS: 'Lait de corps'
+  },
+  [PRODUCT_CATEGORIES.LINGE]: {
+    LESSIVE: 'Lessive'
+  },
+  [PRODUCT_CATEGORIES.CUISINE]: {
+    LAVE_VAISSELLE: 'Lave vaisselle',
+    PRODUIT_VAISSELLE: 'Produit vaisselle'
+  },
+  [PRODUCT_CATEGORIES.NETTOYAGE]: {
+    SPRAY: 'Spray',
+    CLIP_WC: 'Clip wc',
+    EPONGE: 'Eponge',
+    SAC_POUBELLE: 'Sac poubelle'
+  }
 }
 
 export const PRODUCT_VARIANTS = {

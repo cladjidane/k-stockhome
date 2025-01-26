@@ -216,7 +216,7 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params
-    const [product, categories, subcategories, brands, rayons] = await Promise.all([
+    const [product, categories, subcategories, brands, rayons, storages] = await Promise.all([
       prisma.product.findUnique({
         where: { id },
         include: {
@@ -224,13 +224,15 @@ app.get('/api/products/:id', async (req, res) => {
           subCategory: true,
           brand: true,
           rayon: true,
+          storage: true,
           barcodes: true
         }
       }),
       prisma.category.findMany({ orderBy: { name: 'asc' } }),
       prisma.subCategory.findMany({ orderBy: { name: 'asc' } }),
       prisma.brand.findMany({ orderBy: { name: 'asc' } }),
-      prisma.rayon.findMany({ orderBy: { name: 'asc' } })
+      prisma.rayon.findMany({ orderBy: { name: 'asc' } }),
+      prisma.storage.findMany({ orderBy: { name: 'asc' } })
     ])
 
     if (!product) {
@@ -242,7 +244,8 @@ app.get('/api/products/:id', async (req, res) => {
       categories,
       subcategories,
       brands,
-      rayons
+      rayons,
+      storages
     })
   } catch (error) {
     console.error(error)

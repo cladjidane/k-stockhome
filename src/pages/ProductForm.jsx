@@ -64,7 +64,7 @@ export default function ProductForm() {
           if (product) {
             setFormData({
               ...product,
-              storage: product.storage?.id || '',
+              storage: product.storage?.id || null,
               rayon: product.rayon?.id || '',
               category: product.category?.id || '',
               subCategory: product.subCategory?.id || '',

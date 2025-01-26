@@ -45,8 +45,18 @@ model Rayon {
   updatedAt   DateTime      @updatedAt
 }
 
+model Storage {
+  id          String        @id @default(uuid())
+  name        String        @unique
+  products    Product[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
 model Product {
   id              String       @id @default(uuid())
+  storage         Storage?     @relation(fields: [storageId], references: [id])
+  storageId       String?
   rayon           Rayon        @relation(fields: [rayonId], references: [id])
   rayonId         String
   category        Category     @relation(fields: [categoryId], references: [id])

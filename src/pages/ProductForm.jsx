@@ -12,6 +12,7 @@ export default function ProductForm() {
   const location = useLocation()
   const [isScanning, setIsScanning] = useState(false);
   const [categoryOptions, setCategoryOptions] = useState({
+    storage: [],
     rayon: [],
     category: [],
     subCategory: [],
@@ -21,7 +22,8 @@ export default function ProductForm() {
   useEffect(() => {
     const loadOptions = async () => {
       try {
-        const [rayons, categories, subCategories, brands] = await Promise.all([
+        const [storages, rayons, categories, subCategories, brands] = await Promise.all([
+          productService.getStorages(),
           productService.getRayons(),
           productService.getCategories(),
           productService.getSubCategories(),
@@ -29,6 +31,7 @@ export default function ProductForm() {
         ])
 
         setCategoryOptions({
+          storage: storages.map(storage => ({ value: storage.id, label: storage.name })),
           rayon: rayons.map(rayon => ({ value: rayon.id, label: rayon.name })),
           category: categories.map(cat => ({ value: cat.id, label: cat.name })),
           subCategory: subCategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
@@ -57,10 +60,11 @@ export default function ProductForm() {
       if (id) {
         try {
           setIsLoading(true);
-          const { product, categories, subcategories, brands, rayons } = await productService.getProduct(id);
+          const { product, categories, subcategories, brands, rayons, storages } = await productService.getProduct(id);
           if (product) {
             setFormData({
               ...product,
+              storage: product.storage?.id || '',
               rayon: product.rayon?.id || '',
               category: product.category?.id || '',
               subCategory: product.subCategory?.id || '',
@@ -71,6 +75,7 @@ export default function ProductForm() {
             });
 
             setCategoryOptions({
+              storage: storages.map(storage => ({ value: storage.id, label: storage.name })),
               rayon: rayons.map(rayon => ({ value: rayon.id, label: rayon.name })),
               category: categories.map(cat => ({ value: cat.id, label: cat.name })),
               subCategory: subcategories.map(subCat => ({ value: subCat.id, label: subCat.name })),
@@ -100,6 +105,7 @@ export default function ProductForm() {
       }
 
       const productData = {
+        storageId: formData.storage || undefined,
         rayonId: formData.rayon,
         categoryId: formData.category,
         subCategoryId: formData.subCategory || undefined,
@@ -146,6 +152,9 @@ export default function ProductForm() {
     try {
       let newEntity;
       switch (selectType) {
+        case 'storage':
+          newEntity = await productService.createStorage(inputValue);
+          break;
         case 'rayon':
           newEntity = await productService.createRayon(inputValue);
           break;
@@ -263,6 +272,28 @@ export default function ProductForm() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+                    <div className="sm:col-span-2 border-b border-gray-200 pb-6 mb-6">
+                      <label htmlFor="storage" className="block text-sm font-medium leading-6 text-gray-900">
+                        Rangement
+                      </label>
+                      <div className="mt-2">
+                        <Select
+                          id="storage"
+                          name="storage"
+                          value={categoryOptions.storage.find(option => option.value === formData.storage)}
+                          onChange={(newValue) => {
+                            setFormData(prev => ({ ...prev, storage: newValue ? newValue.value : '' }));
+                          }}
+                          options={categoryOptions.storage}
+                          styles={customStyles}
+                          placeholder="Sélectionner un rangement"
+                          isClearable
+                          isSearchable
+                          creatable
+                          onCreateOption={(inputValue) => handleCreateOption(inputValue, 'storage')}
+                        />
+                      </div>
+                    </div>
                     <div className="sm:col-span-1">
                       <label htmlFor="rayon" className="block text-sm font-medium leading-6 text-gray-900">
                         Rayon

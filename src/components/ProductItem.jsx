@@ -51,8 +51,16 @@ export default function ProductItem({ product: initialProduct, onDelete }) {
       <div className={`relative flex flex-col rounded-2xl border p-6 ${getStockStatusClasses()}`}>
         <div className="flex-1">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-medium text-gray-900">
-              {product.rayon?.name || 'Sans rayon'}
+            <h3 className="text-base font-medium text-gray-900 flex items-center gap-2">
+              {product.storage?.name && (
+                <span className="text-sm text-gray-500">{product.storage.name}</span>
+              )}
+              <span className="flex items-center gap-1">
+                {product.storage?.name && (
+                  <span className="text-gray-400">/</span>
+                )}
+                {product.rayon?.name || 'Sans rayon'}
+              </span>
             </h3>
             <div className="flex items-center space-x-1">
               <button

@@ -1,6 +1,15 @@
 import { api } from './api'
 
 export const productService = {
+  // Storage operations
+  getStorages: async () => {
+    return api.get('/storages')
+  },
+
+  createStorage: async (name) => {
+    return api.post('/storages', { name })
+  },
+
   // Rayon operations
   getRayons: async () => {
     return api.get('/rayons')

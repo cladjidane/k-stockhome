@@ -36,6 +36,13 @@ const initialBrands = [
   { name: 'Apta' }
 ]
 
+const initialStorages = [
+  { name: 'Placard cuisine' },
+  { name: 'Placard salle de bain' },
+  { name: 'Cave' },
+  { name: 'Garage' }
+]
+
 const initialProducts = [
   {
     rayon: 'Salle de bain',
@@ -153,6 +160,15 @@ async function main() {
       data: brandData
     })
     brands[brand.name] = brand.id
+  }
+
+  // Create storages
+  const storages = {}
+  for (const storageData of initialStorages) {
+    const storage = await prisma.storage.create({
+      data: storageData
+    })
+    storages[storage.name] = storage.id
   }
 
   // Create products with relationships

@@ -123,6 +123,39 @@ app.get('/api/brands', async (req, res) => {
   }
 })
 
+// Storage endpoints
+app.get('/api/storages', async (req, res) => {
+  try {
+    const storages = await prisma.storage.findMany({
+      orderBy: { name: 'asc' }
+    })
+    res.json(storages)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error retrieving storages' })
+  }
+})
+
+app.post('/api/storages', async (req, res) => {
+  try {
+    const { name } = req.body
+    if (!name) {
+      return res.status(400).json({ error: 'Storage name is required' })
+    }
+    const storage = await prisma.storage.create({
+      data: { name }
+    })
+    res.status(201).json(storage)
+  } catch (error) {
+    console.error(error)
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Storage already exists' })
+    }
+    res.status(500).json({ error: 'Error creating storage' })
+  }
+})
+
+// Brand endpoints
 app.post('/api/brands', async (req, res) => {
   try {
     const { name } = req.body
@@ -165,7 +198,8 @@ app.get('/api/products', async (req, res) => {
         category: true,
         subCategory: true,
         brand: true,
-        rayon: true
+        rayon: true,
+        storage: true
       },
       orderBy: [
         { category: { name: 'asc' } }
@@ -219,7 +253,7 @@ app.get('/api/products/:id', async (req, res) => {
 // Créer un produit
 app.post('/api/products', async (req, res) => {
   try {
-    const { rayonId, categoryId, subCategoryId, brandId, barcodes, conditionnement, quantite } = req.body
+    const { rayonId, categoryId, subCategoryId, brandId, barcodes, conditionnement, quantite, storageId } = req.body
 
     // Validate required fields
     if (!rayonId || !categoryId || !barcodes?.create?.length) {
@@ -234,6 +268,7 @@ app.post('/api/products', async (req, res) => {
         categoryId,
         subCategoryId: subCategoryId || null,
         brandId: brandId || null,
+        storageId: storageId || null,
         conditionnement,
         quantite: quantite || 0,
         barcodes: barcodes
@@ -243,6 +278,7 @@ app.post('/api/products', async (req, res) => {
         subCategory: true,
         brand: true,
         rayon: true,
+        storage: true,
         barcodes: true
       }
     })
@@ -259,7 +295,7 @@ app.post('/api/products', async (req, res) => {
 // Mettre à jour un produit
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const { rayonId, categoryId, subCategoryId, brandId, conditionnement, quantite } = req.body;
+  const { rayonId, categoryId, subCategoryId, brandId, conditionnement, quantite, storageId } = req.body;
 
   try {
     const updatedProduct = await prisma.product.update({
@@ -269,6 +305,7 @@ app.put('/api/products/:id', async (req, res) => {
         categoryId,
         subCategoryId: subCategoryId || null,
         brandId: brandId || null,
+        storageId: storageId || null,
         quantite,
         conditionnement
       },
@@ -277,6 +314,7 @@ app.put('/api/products/:id', async (req, res) => {
         subCategory: true,
         brand: true,
         rayon: true,
+        storage: true,
         barcodes: true
       }
     });

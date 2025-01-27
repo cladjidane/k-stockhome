@@ -48,9 +48,9 @@ export default function ProductForm() {
 
   const [formData, setFormData] = useState(() => {
     if (location.state?.codebar) {
-      return { ...DEFAULT_PRODUCT, barcodes: [location.state.codebar] }
+      return { ...DEFAULT_PRODUCT, barcodes: [location.state.codebar], newBarcode: '' }
     }
-    return { ...DEFAULT_PRODUCT, barcodes: [] }
+    return { ...DEFAULT_PRODUCT, barcodes: [], newBarcode: '' }
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -100,6 +100,11 @@ export default function ProductForm() {
     setIsLoading(true);
 
     try {
+      // Add the newBarcode to barcodes array if it exists and isn't already included
+      if (formData.newBarcode && !formData.barcodes.includes(formData.newBarcode)) {
+        formData.barcodes.push(formData.newBarcode);
+      }
+
       if (!formData.rayon || !formData.category || formData.barcodes.length === 0) {
         throw new Error('Les champs rayon, categorie et au moins un code-barres sont obligatoires');
       }
@@ -437,7 +442,17 @@ export default function ProductForm() {
                               key={barcode}
                               className="inline-flex items-center gap-x-1.5 rounded-md px-2 py-1 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200"
                             >
-                              {barcode}
+                              <input
+                                type="text"
+                                value={barcode}
+                                onChange={(e) => {
+                                  const newBarcodes = [...formData.barcodes];
+                                  const index = newBarcodes.indexOf(barcode);
+                                  newBarcodes[index] = e.target.value;
+                                  setFormData(prev => ({ ...prev, barcodes: newBarcodes }));
+                                }}
+                                className="w-24 bg-transparent border-none p-0 focus:ring-0 text-sm"
+                              />
                               <button
                                 type="button"
                                 onClick={() => removeBarcode(barcode)}
@@ -448,14 +463,52 @@ export default function ProductForm() {
                             </span>
                           ))}
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => setIsScanning(true)}
-                          className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                          <QrCodeIcon className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-                          Scanner un code-barres
-                        </button>
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              placeholder="Entrer un code-barres manuellement"
+                              className="block w-full rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                              value={formData.newBarcode || ''}
+                              onChange={(e) => setFormData(prev => ({ ...prev, newBarcode: e.target.value }))}
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter' && formData.newBarcode) {
+                                  e.preventDefault();
+                                  if (!formData.barcodes.includes(formData.newBarcode)) {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      barcodes: [...prev.barcodes, prev.newBarcode],
+                                      newBarcode: ''
+                                    }));
+                                  }
+                                }
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (formData.newBarcode && !formData.barcodes.includes(formData.newBarcode)) {
+                                setFormData(prev => ({
+                                  ...prev,
+                                  barcodes: [...prev.barcodes, prev.newBarcode],
+                                  newBarcode: ''
+                                }));
+                              }
+                            }}
+                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                          >
+                            Ajouter
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsScanning(true)}
+                            className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                          >
+                            <QrCodeIcon className="-ml-0.5 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
+                            Scanner
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

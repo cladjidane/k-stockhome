@@ -77,7 +77,7 @@ export const productService = {
 
   // Mettre à jour la quantité d'un produit
   updateQuantity: async (id, quantity) => {
-    return api.put(`/products/${id}`, { quantite: quantity })
+    return api.put(`/products/${id}/quantity`, { quantite: quantity })
   },
 
   // Vérifier si un code-barres existe déjà

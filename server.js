@@ -183,11 +183,22 @@ app.get('/api/products', async (req, res) => {
 
     if (search) {
       where.OR = [
-        { category: { name: { contains: search } } },
-        { subCategory: { name: { contains: search } } },
-        { brand: { name: { contains: search } } },
-        { rayon: { name: { contains: search } } },
-        { barcodes: { some: { code: { contains: search } } } },
+        {
+          category: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
+        {
+          rayon: {
+            name: {
+              contains: search,
+              mode: 'insensitive'
+            }
+          }
+        },
       ]
     }
 
@@ -298,9 +309,15 @@ app.post('/api/products', async (req, res) => {
 // Mettre à jour un produit
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const { rayonId, categoryId, subCategoryId, brandId, conditionnement, quantite, storageId } = req.body;
+  const { rayonId, categoryId, subCategoryId, brandId, conditionnement, quantite, storageId, barcodes } = req.body;
 
   try {
+    // First, delete all existing barcodes
+    await prisma.barcode.deleteMany({
+      where: { productId: id }
+    });
+
+    // Then update the product with new barcodes
     const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
@@ -310,7 +327,8 @@ app.put('/api/products/:id', async (req, res) => {
         brandId: brandId || null,
         storageId: storageId || null,
         quantite,
-        conditionnement
+        conditionnement,
+        barcodes: barcodes // This will create the new barcodes
       },
       include: {
         category: true,
@@ -329,6 +347,32 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
+// Add this new endpoint
+app.put('/api/products/:id/quantity', async (req, res) => {
+  const { id } = req.params;
+  const { quantite } = req.body;
+
+  try {
+    const updatedProduct = await prisma.product.update({
+      where: { id },
+      data: { quantite },
+      include: {
+        category: true,
+        subCategory: true,
+        brand: true,
+        rayon: true,
+        storage: true,
+        barcodes: true
+      }
+    });
+
+    res.json(updatedProduct);
+  } catch (error) {
+    console.error('Error updating quantity:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Delete a product
 app.delete('/api/products/:id', async (req, res) => {
   try {
@@ -343,7 +387,7 @@ app.delete('/api/products/:id', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3005
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })

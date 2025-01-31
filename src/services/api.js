@@ -1,4 +1,5 @@
 const API_URL = window.location.hostname === 'localhost' ? '/api' : `${window.location.protocol}//${window.location.hostname}/api`
+// const API_URL = 'http://localhost:3005/api'
 
 export const api = {
   async get(endpoint) {
